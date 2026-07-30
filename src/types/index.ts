@@ -28,7 +28,7 @@ export interface UmkmItem {
   rating: number;
 }
 
-export type WisataCategory = 'Wisata Alam' | 'Wisata Budaya' | 'Wisata Edukasi' | 'Wisata Kuliner';
+export type WisataCategory = 'Wisata Alam' | 'Wisata Edukasi' | 'Wisata Kuliner';
 
 export interface WisataItem {
   id: string;
@@ -78,7 +78,7 @@ export interface PejabatDusun {
 
 export interface PotensiSDA {
   id: string;
-  kategori: 'Pertanian' | 'Perkebunan' | 'Peternakan' | 'Perikanan' | 'Hutan dan Lingkungan';
+  kategori: 'Pertanian' | 'Perkebunan' | 'Peternakan' | 'Perikanan';
   nama: string;
   deskripsi: string;
   luasAtauJumlah: string;

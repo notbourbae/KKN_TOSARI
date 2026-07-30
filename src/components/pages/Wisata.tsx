@@ -26,7 +26,6 @@ export const Wisata: React.FC = () => {
   const categories = [
     { name: 'Semua', icon: <Compass className="w-4 h-4" /> },
     { name: 'Wisata Alam', icon: <Trees className="w-4 h-4" /> },
-    { name: 'Wisata Budaya', icon: <Landmark className="w-4 h-4" /> },
     { name: 'Wisata Edukasi', icon: <GraduationCap className="w-4 h-4" /> },
     { name: 'Wisata Kuliner', icon: <UtensilsCrossed className="w-4 h-4" /> },
   ];

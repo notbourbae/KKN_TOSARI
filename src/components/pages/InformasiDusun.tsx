@@ -35,14 +35,12 @@ export const InformasiDusun: React.FC = () => {
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
   const [tempFoto, setTempFoto] = useState<string>('');
 
-  const [beritaFilter, setBeritaFilter] = useState<string>('Semua');
   const [beritaSearch, setBeritaSearch] = useState<string>('');
 
   const filteredBerita = beritaList.filter(b => {
-    const matchesCategory = beritaFilter === 'Semua' || b.kategori === beritaFilter;
-    const matchesSearch = b.judul.toLowerCase().includes(beritaSearch.toLowerCase()) ||
-                          b.ringkasan.toLowerCase().includes(beritaSearch.toLowerCase());
-    return matchesCategory && matchesSearch;
+    return b.judul.toLowerCase().includes(beritaSearch.toLowerCase()) ||
+           b.ringkasan.toLowerCase().includes(beritaSearch.toLowerCase()) ||
+           b.kategori.toLowerCase().includes(beritaSearch.toLowerCase());
   });
 
   return (
@@ -335,36 +333,18 @@ export const InformasiDusun: React.FC = () => {
       {activeInfoSubTab === 'berita' && (
         <div className="space-y-6 animate-in fade-in duration-200">
           
-          {/* Search & Category Filter Header */}
-          <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
-            
-            {/* Category Tabs */}
-            <div className="flex items-center gap-1 overflow-x-auto w-full sm:w-auto">
-              {['Semua', 'Berita', 'Pengumuman', 'Agenda'].map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setBeritaFilter(cat)}
-                  className={`px-3.5 py-1.5 rounded-lg font-semibold text-xs transition-colors cursor-pointer whitespace-nowrap ${
-                    beritaFilter === cat
-                      ? 'bg-emerald-700 text-white'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-
+          {/* Search Header */}
+          <div className="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
             {/* Search Input */}
-            <div className="relative w-full sm:w-64">
+            <div className="relative w-full">
               <input
                 type="text"
-                placeholder="Cari kata kunci berita..."
+                placeholder="Cari kata kunci berita atau pengumuman..."
                 value={beritaSearch}
                 onChange={e => setBeritaSearch(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs focus:ring-2 focus:ring-emerald-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-8 pr-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500"
               />
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-3" />
             </div>
           </div>
 

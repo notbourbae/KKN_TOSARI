@@ -347,7 +347,7 @@ export const Home: React.FC = () => {
           <div className="inline-flex items-center gap-2 bg-emerald-800 text-emerald-200 px-3 py-1 rounded-full text-xs font-semibold">
             <Trees className="w-4 h-4" /> Kekayaan Alam Dusun Tosari
           </div>
-          <h3 className="text-2xl font-bold">Potensi Pertanian, Perkebunan & Kehutanan</h3>
+          <h3 className="text-2xl font-bold">Potensi Pertanian, Perkebunan & Sumber Daya Alam</h3>
           <p className="text-emerald-100 text-xs sm:text-sm leading-relaxed">
             Dusun Tosari dianugerahi tanah subur 145 Hektar, hasil panen padi organik, kopi petik merah, serta sumber mata air murni pegunungan Cikahuripan.
           </p>

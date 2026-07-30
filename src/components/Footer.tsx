@@ -1,9 +1,9 @@
 import React from 'react';
 import { useDusun } from '../context/DusunContext';
-import { Building2, MapPin, Phone, Mail, RotateCcw, Heart, ShieldCheck } from 'lucide-react';
+import { Building2, MapPin, Phone, Mail, Heart, ShieldCheck } from 'lucide-react';
 
 export const Footer: React.FC = () => {
-  const { dusunInfo, setActiveTab, setActiveInfoSubTab, resetToDefaultData } = useDusun();
+  const { dusunInfo, setActiveTab, setActiveInfoSubTab } = useDusun();
 
   return (
     <footer id="site-footer" className="bg-slate-900 text-slate-300 pt-12 pb-8 border-t border-slate-800 mt-20">
@@ -137,17 +137,10 @@ export const Footer: React.FC = () => {
             </p>
             <button
               onClick={() => setActiveTab('admin')}
-              className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold py-2 px-4 rounded-xl text-xs transition-colors shadow-md cursor-pointer mb-3"
+              className="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold py-2 px-4 rounded-xl text-xs transition-colors shadow-md cursor-pointer"
             >
               <ShieldCheck className="w-4 h-4" />
               Kelola Website (Admin)
-            </button>
-            <button
-              onClick={resetToDefaultData}
-              className="w-full flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white py-1.5 px-3 rounded-lg text-[11px] transition-colors border border-slate-700"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              Reset Data Bawaan Sistem
             </button>
           </div>
 

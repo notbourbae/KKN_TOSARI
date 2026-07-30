@@ -29,7 +29,6 @@ export const SumberDayaAlam: React.FC = () => {
     { name: 'Perkebunan', icon: <Leaf className="w-4 h-4 text-amber-600" /> },
     { name: 'Peternakan', icon: <Beef className="w-4 h-4 text-red-600" /> },
     { name: 'Perikanan', icon: <Fish className="w-4 h-4 text-blue-600" /> },
-    { name: 'Hutan dan Lingkungan', icon: <Mountain className="w-4 h-4 text-teal-600" /> },
   ];
 
   const filteredSDA = potensiSDA.filter(s => {
@@ -47,7 +46,6 @@ export const SumberDayaAlam: React.FC = () => {
       case 'Perkebunan': return <Leaf className="w-4 h-4 text-amber-600" />;
       case 'Peternakan': return <Beef className="w-4 h-4 text-red-600" />;
       case 'Perikanan': return <Fish className="w-4 h-4 text-blue-600" />;
-      case 'Hutan dan Lingkungan': return <Mountain className="w-4 h-4 text-teal-600" />;
       default: return <Trees className="w-4 h-4 text-emerald-600" />;
     }
   };

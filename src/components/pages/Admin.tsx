@@ -89,7 +89,7 @@ export const Admin: React.FC = () => {
 
   // New Wisata Form State
   const [newWisataName, setNewWisataName] = useState('');
-  const [newWisataCat, setNewWisataCat] = useState<'Wisata Alam' | 'Wisata Budaya' | 'Wisata Edukasi' | 'Wisata Kuliner'>('Wisata Alam');
+  const [newWisataCat, setNewWisataCat] = useState<'Wisata Alam' | 'Wisata Edukasi' | 'Wisata Kuliner'>('Wisata Alam');
   const [newWisataDesc, setNewWisataDesc] = useState('');
   const [newWisataHours, setNewWisataHours] = useState('08:00 - 17:00 WIB');
   const [newWisataTicket, setNewWisataTicket] = useState('Rp 10.000 / Orang');
@@ -108,7 +108,7 @@ export const Admin: React.FC = () => {
 
   // New SDA Form State
   const [newSdaName, setNewSdaName] = useState('');
-  const [newSdaCat, setNewSdaCat] = useState<'Pertanian' | 'Perkebunan' | 'Peternakan' | 'Perikanan' | 'Hutan dan Lingkungan'>('Pertanian');
+  const [newSdaCat, setNewSdaCat] = useState<'Pertanian' | 'Perkebunan' | 'Peternakan' | 'Perikanan'>('Pertanian');
   const [newSdaDesc, setNewSdaDesc] = useState('');
   const [newSdaLuas, setNewSdaLuas] = useState('');
   const [newSdaHasil, setNewSdaHasil] = useState('');
@@ -1221,7 +1221,6 @@ export const Admin: React.FC = () => {
                   className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2"
                 >
                   <option value="Wisata Alam">Wisata Alam</option>
-                  <option value="Wisata Budaya">Wisata Budaya</option>
                   <option value="Wisata Edukasi">Wisata Edukasi</option>
                   <option value="Wisata Kuliner">Wisata Kuliner</option>
                 </select>
@@ -1317,7 +1316,6 @@ export const Admin: React.FC = () => {
                   <option value="Perkebunan">Perkebunan</option>
                   <option value="Peternakan">Peternakan</option>
                   <option value="Perikanan">Perikanan</option>
-                  <option value="Hutan dan Lingkungan">Hutan dan Lingkungan</option>
                 </select>
               </div>
 

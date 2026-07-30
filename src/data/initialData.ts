@@ -263,7 +263,7 @@ export const initialWisata: WisataItem[] = [
   {
     id: 'w3',
     nama: 'Rumah Adat & Sanggar Seni Calung Tosari',
-    kategori: 'Wisata Budaya',
+    kategori: 'Wisata Edukasi',
     deskripsi: 'Pusat pelestarian kebudayaan tradisional Sunda. Pengunjung dapat menyaksikan pertunjukan musik Calung Bambu, tarian Jaipong, pelatihan ukir bambu, serta meminjam pakaian adat tradisional untuk berfoto.',
     gambar: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
     googleMapsPin: 'https://maps.google.com/?q=-6.927000,107.632000',
@@ -355,16 +355,6 @@ export const initialPotensiSDA: PotensiSDA[] = [
     estimasiHasil: '35 Ton Ikan Konsumsi / Tahun',
     gambar: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80',
     lokasi: 'Aliran Sungai Cikahuripan'
-  },
-  {
-    id: 'sda5',
-    kategori: 'Hutan dan Lingkungan',
-    nama: 'Hutan Pinus & Area Ekowisata Conservation',
-    deskripsi: 'Kawasan hutan pelindung erosi tanah sekaligus paru-paru dusun yang dikelola bersama Pokdarwis dan LMDH.',
-    luasAtauJumlah: '28 Hektar',
-    estimasiHasil: 'Kawasan Resapan Air & Ekowisata',
-    gambar: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&auto=format&fit=crop&q=80',
-    lokasi: 'Kawasan Utara Dusun'
   }
 ];
 
