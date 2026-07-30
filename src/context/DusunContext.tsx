@@ -244,7 +244,7 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // ─── Admin auth ───────────────────────────────────
   const loginAdmin = (passcode: string) => {
-    if (passcode === 'admin123' || passcode === 'admin' || passcode === '123456') {
+    if (passcode === 'Tosari2026') {
       setIsAdmin(true);
       return true;
     }

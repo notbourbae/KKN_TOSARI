@@ -286,7 +286,7 @@ export const Admin: React.FC = () => {
             <div className="relative">
               <input
                 type="password"
-                placeholder="Masukkan kata sandi (contoh: admin123)"
+                placeholder="Masukkan kata sandi"
                 value={passcode}
                 onChange={e => setPasscode(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-xs focus:ring-2 focus:ring-emerald-500 font-mono"
@@ -295,7 +295,7 @@ export const Admin: React.FC = () => {
             </div>
             {loginError && (
               <p className="text-[11px] text-red-500 mt-1 font-semibold flex items-center gap-1">
-                <AlertCircle className="w-3.5 h-3.5" /> Kata sandi salah. Gunakan <strong>admin123</strong>
+                <AlertCircle className="w-3.5 h-3.5" /> Kata sandi salah Silakan coba lagi.
               </p>
             )}
           </div>
@@ -308,15 +308,7 @@ export const Admin: React.FC = () => {
           </button>
         </form>
 
-        <div className="pt-4 border-t border-slate-100 text-xs text-slate-500 space-y-2">
-          <p>Atau klik tombol cepat di bawah untuk demo langsung:</p>
-          <button
-            onClick={() => loginAdmin('admin123')}
-            className="bg-amber-100 text-amber-900 font-bold px-4 py-2 rounded-xl text-xs hover:bg-amber-200 transition-colors w-full cursor-pointer"
-          >
-            ⚡ Masuk Otomatis (Demo Mode)
-          </button>
-        </div>
+
       </div>
     );
   }

@@ -38,15 +38,15 @@ export const Home: React.FC = () => {
     <div id="page-home" className="space-y-16 animate-in fade-in duration-300">
       
       {/* Hero Section */}
-      <section className="relative rounded-3xl overflow-hidden bg-slate-950 text-white shadow-2xl border border-emerald-900/30">
+      <section className="relative rounded-3xl overflow-hidden bg-slate-900 text-white shadow-2xl border border-emerald-900/30">
         <div className="absolute inset-0 z-0">
           <img
             src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&auto=format&fit=crop&q=80"
             alt="Pemandangan Dusun Tosari"
             referrerPolicy="no-referrer"
-            className="w-full h-full object-cover opacity-40 scale-105"
+            className="w-full h-full object-cover opacity-70 scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/70 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-950/40 to-transparent"></div>
         </div>
 
         <div className="relative z-10 max-w-4xl px-6 sm:px-12 py-16 sm:py-24 space-y-6">
@@ -353,10 +353,14 @@ export const Home: React.FC = () => {
           </p>
         </div>
         <button
-          onClick={() => setActiveTab('sda')}
-          className="bg-white hover:bg-emerald-50 text-emerald-900 font-extrabold px-6 py-3 rounded-xl text-xs sm:text-sm shadow-md transition-colors shrink-0 cursor-pointer"
+          onClick={() => {
+            setActiveTab('sda');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          className="bg-white hover:bg-emerald-50 text-emerald-900 font-extrabold px-6 py-3 rounded-xl text-xs sm:text-sm shadow-md transition-all shrink-0 cursor-pointer flex items-center gap-2 transform hover:-translate-y-0.5"
         >
-          Lihat Data & Statistik Hasil Panen
+          <span>Jelajahi Potensi Sumber Daya Alam (SDA)</span>
+          <ArrowRight className="w-4 h-4 text-emerald-700" />
         </button>
       </section>
 
