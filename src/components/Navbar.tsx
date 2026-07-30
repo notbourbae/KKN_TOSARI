@@ -6,6 +6,7 @@ import {
   Info,
   Store,
   Compass,
+  Landmark,
   Trees,
   ShieldCheck,
   Menu,
@@ -213,6 +214,22 @@ export const Navbar: React.FC = () => {
               </button>
             </li>
 
+            {/* BUDAYA */}
+            <li>
+              <button
+                id="nav-tab-budaya"
+                onClick={() => handleNavClick('budaya')}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all ${
+                  activeTab === 'budaya'
+                    ? 'bg-emerald-700 text-white font-semibold shadow-xs'
+                    : 'hover:bg-slate-200/70 text-slate-700'
+                }`}
+              >
+                <Landmark className="w-4 h-4" />
+                Budaya
+              </button>
+            </li>
+
             {/* SUMBER DAYA ALAM */}
             <li>
               <button
@@ -319,6 +336,16 @@ export const Navbar: React.FC = () => {
           >
             <Compass className="w-5 h-5" />
             Wisata Dusun
+          </button>
+
+          <button
+            onClick={() => handleNavClick('budaya')}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium text-sm ${
+              activeTab === 'budaya' ? 'bg-emerald-700 text-white' : 'text-slate-800 hover:bg-slate-100'
+            }`}
+          >
+            <Landmark className="w-5 h-5" />
+            Budaya & Tradisi
           </button>
 
           <button

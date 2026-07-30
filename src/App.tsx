@@ -7,6 +7,7 @@ import { InformasiDusun } from './components/pages/InformasiDusun';
 import { Umkm } from './components/pages/Umkm';
 import { Wisata } from './components/pages/Wisata';
 import { SumberDayaAlam } from './components/pages/SumberDayaAlam';
+import { Budaya } from './components/pages/Budaya';
 import { Admin } from './components/pages/Admin';
 import { BackgroundDecoration } from './components/BackgroundDecoration';
 
@@ -34,6 +35,7 @@ const MainContent: React.FC = () => {
             {activeTab === 'informasi' && <InformasiDusun />}
             {activeTab === 'umkm' && <Umkm />}
             {activeTab === 'wisata' && <Wisata />}
+            {activeTab === 'budaya' && <Budaya />}
             {activeTab === 'sda' && <SumberDayaAlam />}
             {activeTab === 'admin' && <Admin />}
           </main>

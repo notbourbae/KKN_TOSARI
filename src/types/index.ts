@@ -1,4 +1,4 @@
-export type PageTab = 'beranda' | 'informasi' | 'umkm' | 'wisata' | 'sda' | 'admin';
+export type PageTab = 'beranda' | 'informasi' | 'umkm' | 'wisata' | 'budaya' | 'sda' | 'admin';
 
 export type InfoSubTab = 'profil' | 'sejarah' | 'visi-misi' | 'struktur' | 'berita';
 
@@ -85,6 +85,16 @@ export interface PotensiSDA {
   estimasiHasil: string;
   gambar: string;
   lokasi: string;
+}
+
+export interface BudayaItem {
+  id: string;
+  nama: string;
+  kategori: string;
+  deskripsi: string;
+  gambar: string;
+  lokasi: string;
+  status: 'aktif' | 'lestari';
 }
 
 export interface StatistikProduksi {

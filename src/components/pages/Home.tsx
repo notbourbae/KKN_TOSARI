@@ -12,7 +12,8 @@ import {
   Trees,
   Quote,
   Building2,
-  Calendar
+  Calendar,
+  Landmark
 } from 'lucide-react';
 
 export const Home: React.FC = () => {
@@ -21,6 +22,7 @@ export const Home: React.FC = () => {
     beritaList,
     umkmList,
     wisataList,
+    budayaList,
     setActiveTab,
     setActiveInfoSubTab,
     setSelectedUmkmModal,
@@ -36,7 +38,7 @@ export const Home: React.FC = () => {
 
   return (
     <div id="page-home" className="space-y-16 animate-in fade-in duration-300">
-      
+
       {/* Hero Section */}
       <section className="relative rounded-3xl overflow-hidden bg-slate-900 text-white shadow-2xl border border-emerald-900/30">
         <div className="absolute inset-0 z-0">
@@ -81,6 +83,14 @@ export const Home: React.FC = () => {
             </button>
 
             <button
+              onClick={() => setActiveTab('budaya')}
+              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-5 py-3 rounded-xl text-xs sm:text-sm backdrop-blur-md border border-white/20 transition-all cursor-pointer"
+            >
+              <Landmark className="w-4 h-4 text-amber-300" />
+              Kebudayaan & Tradisi
+            </button>
+
+            <button
               onClick={() => setShowUmkmRegisterModal(true)}
               className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-5 py-3 rounded-xl text-xs sm:text-sm shadow-md transition-all cursor-pointer"
             >
@@ -91,7 +101,7 @@ export const Home: React.FC = () => {
       </section>
 
       {/* Quick Statistics Banner */}
-      <section className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+      <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center gap-4 hover:border-emerald-300 transition-colors">
           <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700 shrink-0">
             <Users className="w-6 h-6" />
@@ -129,6 +139,19 @@ export const Home: React.FC = () => {
           <div>
             <p className="text-2xl font-black text-slate-900">{wisataList.length}</p>
             <p className="text-xs text-slate-500 font-medium">Destinasi Wisata</p>
+          </div>
+        </div>
+
+        <div
+          onClick={() => setActiveTab('budaya')}
+          className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center gap-4 hover:border-amber-400 transition-colors cursor-pointer col-span-2 sm:col-span-1"
+        >
+          <div className="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800 shrink-0">
+            <Landmark className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-2xl font-black text-slate-900">{budayaList.length}</p>
+            <p className="text-xs text-slate-500 font-medium">Warisan Kebudayaan</p>
           </div>
         </div>
       </section>
@@ -202,10 +225,9 @@ export const Home: React.FC = () => {
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                <span className={`absolute top-3 left-3 text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
-                  item.kategori === 'Pengumuman' ? 'bg-amber-500 text-slate-950' :
+                <span className={`absolute top-3 left-3 text-[10px] font-bold px-2.5 py-0.5 rounded-full ${item.kategori === 'Pengumuman' ? 'bg-amber-500 text-slate-950' :
                   item.kategori === 'Agenda' ? 'bg-blue-600 text-white' : 'bg-emerald-700 text-white'
-                }`}>
+                  }`}>
                   {item.kategori}
                 </span>
               </div>

@@ -8,7 +8,8 @@ import {
   WisataEvent,
   PejabatDusun,
   PotensiSDA,
-  StatistikProduksi
+  StatistikProduksi,
+  BudayaItem
 } from '../types';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
@@ -54,6 +55,7 @@ export interface AllDusunData {
   umkmList: UmkmItem[];
   wisataList: WisataItem[];
   wisataEvents: WisataEvent[];
+  budayaList: BudayaItem[];
   potensiSDA: PotensiSDA[];
   statistikProduksi: StatistikProduksi[];
 }
@@ -180,6 +182,18 @@ function mapPotensiSDA(data: any): PotensiSDA {
   };
 }
 
+function mapBudaya(data: any): BudayaItem {
+  return {
+    id: data.id,
+    nama: data.nama,
+    kategori: data.kategori || 'Kesenian',
+    deskripsi: data.deskripsi || '',
+    gambar: data.gambar || '',
+    lokasi: data.lokasi || '',
+    status: data.status || 'aktif'
+  };
+}
+
 function mapStatistikProduksi(data: any): StatistikProduksi {
   return {
     tahun: data.tahun || '',
@@ -205,6 +219,7 @@ export async function syncAllFromSupabase(): Promise<AllDusunData | null> {
       { data: umkmRes },
       { data: wisataRes },
       { data: wisataEventsRes },
+      { data: budayaRes },
       { data: potensiSDARes },
       { data: statistikRes }
     ] = await Promise.all([
@@ -214,6 +229,7 @@ export async function syncAllFromSupabase(): Promise<AllDusunData | null> {
       supabase.from('umkm').select('*').order('created_at', { ascending: false }),
       supabase.from('wisata').select('*'),
       supabase.from('wisata_events').select('*').order('created_at', { ascending: false }),
+      supabase.from('budaya').select('*'),
       supabase.from('potensi_sda').select('*'),
       supabase.from('statistik_produksi').select('*').order('tahun', { ascending: false })
     ]);
@@ -228,6 +244,7 @@ export async function syncAllFromSupabase(): Promise<AllDusunData | null> {
       umkmList: (umkmRes || []).map(mapUmkm),
       wisataList: (wisataRes || []).map(mapWisata),
       wisataEvents: (wisataEventsRes || []).map(mapWisataEvent),
+      budayaList: (budayaRes || []).map(mapBudaya),
       potensiSDA: (potensiSDARes || []).map(mapPotensiSDA),
       statistikProduksi: (statistikRes || []).map(mapStatistikProduksi)
     };
@@ -514,4 +531,26 @@ export async function saveStatistikProduksi(list: StatistikProduksi[]) {
     peternakan_ekor: s.peternakanEkor
   }));
   await supabase.from('statistik_produksi').upsert(rows, { onConflict: 'tahun' });
+}
+
+// ──────────────────────────────────────────────────
+// BUDAYA
+// ──────────────────────────────────────────────────
+
+export async function createBudaya(data: BudayaItem) {
+  if (!supabase) return;
+  await supabase.from('budaya').insert({
+    id: data.id,
+    nama: data.nama,
+    kategori: data.kategori,
+    deskripsi: data.deskripsi,
+    gambar: data.gambar,
+    lokasi: data.lokasi,
+    status: data.status
+  });
+}
+
+export async function deleteBudaya(id: string) {
+  if (!supabase) return;
+  await supabase.from('budaya').delete().eq('id', id);
 }

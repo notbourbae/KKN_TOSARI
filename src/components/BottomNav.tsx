@@ -6,6 +6,7 @@ import {
   Info,
   Store,
   Compass,
+  Landmark,
   Trees
 } from 'lucide-react';
 
@@ -25,6 +26,7 @@ export const BottomNav: React.FC = () => {
     { id: 'informasi' as PageTab, label: 'Informasi', icon: <Info className="w-5 h-5" /> },
     { id: 'umkm' as PageTab, label: 'UMKM', icon: <Store className="w-5 h-5" /> },
     { id: 'wisata' as PageTab, label: 'Wisata', icon: <Compass className="w-5 h-5" /> },
+    { id: 'budaya' as PageTab, label: 'Budaya', icon: <Landmark className="w-5 h-5" /> },
     { id: 'sda' as PageTab, label: 'SDA', icon: <Trees className="w-5 h-5" /> },
   ];
 

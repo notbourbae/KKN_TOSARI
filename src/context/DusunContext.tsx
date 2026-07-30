@@ -9,7 +9,8 @@ import {
   WisataEvent,
   PejabatDusun,
   PotensiSDA,
-  StatistikProduksi
+  StatistikProduksi,
+  BudayaItem
 } from '../types';
 import {
   initialDusunInfo,
@@ -18,6 +19,7 @@ import {
   initialUmkm,
   initialWisata,
   initialWisataEvents,
+  initialBudaya,
   initialPotensiSDA,
   initialStatistikProduksi
 } from '../data/initialData';
@@ -38,6 +40,8 @@ import {
   deletePotensiSDA as deletePotensiSDASupabase,
   createWisataEvent,
   saveStatistikProduksi,
+  createBudaya,
+  deleteBudaya as deleteBudayaSupabase,
   isSupabaseConfigured,
   supabase
 } from '../lib/supabase';
@@ -90,6 +94,10 @@ interface DusunContextType {
   updateWisata: (id: string, data: Partial<WisataItem>) => void;
   deleteWisata: (id: string) => void;
   toggleFavoriteWisata: (id: string) => void;
+
+  budayaList: BudayaItem[];
+  addBudaya: (budaya: Omit<BudayaItem, 'id'>) => void;
+  deleteBudaya: (id: string) => void;
 
   wisataEvents: WisataEvent[];
   addWisataEvent: (event: Omit<WisataEvent, 'id'>) => void;
@@ -146,6 +154,8 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const [wisataEvents, setWisataEvents] = useState<WisataEvent[]>(() => getLocalStorage('dusun_wisata_events_v1', initialWisataEvents));
 
+  const [budayaList, setBudayaList] = useState<BudayaItem[]>(() => getLocalStorage('dusun_budaya_v1', initialBudaya));
+
   const [potensiSDA, setPotensiSDA] = useState<PotensiSDA[]>(() => getLocalStorage('dusun_sda_v1', initialPotensiSDA));
 
   const [statistikProduksi, setStatistikProduksi] = useState<StatistikProduksi[]>(() => getLocalStorage('dusun_statistik_v1', initialStatistikProduksi));
@@ -165,6 +175,7 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => { setLocalStorage('dusun_umkm_v1', umkmList); }, [umkmList]);
   useEffect(() => { setLocalStorage('dusun_wisata_v1', wisataList); }, [wisataList]);
   useEffect(() => { setLocalStorage('dusun_wisata_events_v1', wisataEvents); }, [wisataEvents]);
+  useEffect(() => { setLocalStorage('dusun_budaya_v1', budayaList); }, [budayaList]);
   useEffect(() => { setLocalStorage('dusun_sda_v1', potensiSDA); }, [potensiSDA]);
   useEffect(() => { setLocalStorage('dusun_statistik_v1', statistikProduksi); }, [statistikProduksi]);
   useEffect(() => { try { localStorage.setItem('dusun_is_admin_v1', String(isAdmin)); } catch {} }, [isAdmin]);
@@ -201,6 +212,10 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (data.wisataEvents.length > 0) {
           setWisataEvents(data.wisataEvents);
           setLocalStorage('dusun_wisata_events_v1', data.wisataEvents);
+        }
+        if (data.budayaList.length > 0) {
+          setBudayaList(data.budayaList);
+          setLocalStorage('dusun_budaya_v1', data.budayaList);
         }
         if (data.potensiSDA.length > 0) {
           setPotensiSDA(data.potensiSDA);
@@ -403,6 +418,24 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
+  const addBudaya = (data: Omit<BudayaItem, 'id'>) => {
+    const newItem: BudayaItem = {
+      ...data,
+      id: 'bdy_' + Date.now()
+    };
+    setBudayaList(prev => [newItem, ...prev]);
+    if (isSupabaseConfigured && supabase) {
+      createBudaya(newItem).catch(err => console.error('Gagal simpan budaya ke Supabase:', err));
+    }
+  };
+
+  const deleteBudaya = (id: string) => {
+    setBudayaList(prev => prev.filter(b => b.id !== id));
+    if (isSupabaseConfigured && supabase) {
+      deleteBudayaSupabase(id).catch(err => console.error('Gagal hapus budaya dari Supabase:', err));
+    }
+  };
+
   const addPotensiSDA = (sda: Omit<PotensiSDA, 'id'>) => {
     const newItem: PotensiSDA = {
       ...sda,
@@ -441,6 +474,7 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setUmkmList(initialUmkm);
       setWisataList(initialWisata);
       setWisataEvents(initialWisataEvents);
+      setBudayaList(initialBudaya);
       setPotensiSDA(initialPotensiSDA);
       setStatistikProduksi(initialStatistikProduksi);
       localStorage.clear();
@@ -479,6 +513,9 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         toggleFavoriteWisata,
         wisataEvents,
         addWisataEvent,
+        budayaList,
+        addBudaya,
+        deleteBudaya,
         potensiSDA,
         addPotensiSDA,
         updatePotensiSDA,

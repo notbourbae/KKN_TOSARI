@@ -1,4 +1,4 @@
-import { DusunInfo, BeritaItem, UmkmItem, WisataItem, WisataEvent, PejabatDusun, PotensiSDA, StatistikProduksi } from '../types';
+import { DusunInfo, BeritaItem, UmkmItem, WisataItem, WisataEvent, PejabatDusun, PotensiSDA, StatistikProduksi, BudayaItem } from '../types';
 
 export const initialDusunInfo: DusunInfo = {
   namaDusun: 'Dusun Tosari',
@@ -312,6 +312,54 @@ export const initialWisataEvents: WisataEvent[] = [
     lokasi: 'Area Wisata Curug Cikahuripan',
     deskripsi: 'Kompetisi memancing ikan air deras dan jalan sehat menyusuri hutan pinus.',
     kategori: 'Olahraga & Rekreasi'
+  }
+];
+
+export const initialBudaya: BudayaItem[] = [
+  {
+    id: 'bdy1',
+    nama: 'Seni Musik Calung Bambu Tosari',
+    kategori: 'Kesenian',
+    deskripsi: 'Alat musik tradisional khas Sunda yang terbuat dari bambu pilihan, dimainkan secara ensemble. Sanggar Calung Tosari aktif menggelar pertunjukan di acara adat, festival dusun, dan menerima pelatihan bagi generasi muda setiap hari Minggu.',
+    gambar: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
+    lokasi: 'Sanggar Seni Tosari, RT 03 RW 01',
+    status: 'aktif'
+  },
+  {
+    id: 'bdy2',
+    nama: 'Tari Jaipong & Rampak Kendang',
+    kategori: 'Tarian Tradisional',
+    deskripsi: 'Tarian pergaulan khas Sunda yang enerjik dan penuh improvisasi, diiringi kendang, gong, dan rebab. Sanggar Tari Tosari melatih 30 penari muda dan sering menjadi pembuka hajatan besar maupun penyambutan tamu penting di tingkat kecamatan.',
+    gambar: 'https://images.unsplash.com/photo-1545224140-10d600b1ac5d?w=800&auto=format&fit=crop&q=80',
+    lokasi: 'Balai Dusun Tosari, RT 02 RW 01',
+    status: 'aktif'
+  },
+  {
+    id: 'bdy3',
+    nama: 'Upacara Adat Seren Taun',
+    kategori: 'Upacara Adat',
+    deskripsi: 'Ritual tahunan syukur masyarakat petani atas hasil panen padi dan kopi yang melimpah. Rangkaian acara meliputi arak-arakan gunungan hasil bumi, doa bersama tetua adat, pagelaran wayang golek semalam suntuk, dan makan bersama seluruh warga dusun.',
+    gambar: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=800&auto=format&fit=crop&q=80',
+    lokasi: 'Lapangan Dusun Tosari & Area Persawahan',
+    status: 'aktif'
+  },
+  {
+    id: 'bdy4',
+    nama: 'Kerajinan Anyaman Bambu & Mendong',
+    kategori: 'Kerajinan Tradisional',
+    deskripsi: 'Keterampilan turun-temurun menganyam bambu dan serat mendong menjadi kap lampu estetik, bakul nasi, tampah, tas belanja, dan souvenir khas dusun. Sentra kerajinan terletak di rumah produksi "Bambu Asri" yang produknya telah dipasarkan hingga luar kota.',
+    gambar: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=800&auto=format&fit=crop&q=80',
+    lokasi: 'Sentra Kerajinan Bambu Asri, RT 01 RW 01',
+    status: 'aktif'
+  },
+  {
+    id: 'bdy5',
+    nama: 'Basa Sunda & Kawih Buhun',
+    kategori: 'Bahasa & Sastra Lisan',
+    deskripsi: 'Pelestarian bahasa Sunda lemes (halus) dan kawih buhun (nyanyian tradisional) melalui program muatan lokal di SD Negeri Dusun Tosari dan forum rutin "Mikukuh Basa" setiap hari Jumat malam di balai dusun.',
+    gambar: 'https://images.unsplash.com/photo-1516307365426-bea591f05011?w=800&auto=format&fit=crop&q=80',
+    lokasi: 'SDN Dusun Tosari & Balai Dusun',
+    status: 'lestari'
   }
 ];
 
