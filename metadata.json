@@ -1,0 +1,6 @@
+{
+  "name": "Website Informasi Dusun",
+  "description": "Portal Resmi Informasi Dusun, Profil, UMKM, Destinasi Wisata, Potensi Sumber Daya Alam, dan Panel Kelola Administrator.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
