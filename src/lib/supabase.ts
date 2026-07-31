@@ -469,9 +469,26 @@ export async function deleteWisata(id: string) {
 // WISATA EVENTS
 // ──────────────────────────────────────────────────
 
+/*
+SQL untuk membuat tabel wisata_events di Supabase Dashboard (SQL Editor):
+Lihat file supabase-wisata-events.sql di root proyek.
+
+CREATE TABLE IF NOT EXISTS wisata_events (
+  id TEXT PRIMARY KEY,
+  judul TEXT NOT NULL,
+  tanggal TEXT,
+  lokasi TEXT DEFAULT '',
+  deskripsi TEXT DEFAULT '',
+  kategori TEXT DEFAULT '',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE wisata_events DISABLE ROW LEVEL SECURITY;
+*/
+
 export async function createWisataEvent(data: WisataEvent) {
   if (!supabase) return;
-  await supabase.from('wisata_events').insert({
+  const { error } = await supabase.from('wisata_events').insert({
     id: data.id,
     judul: data.judul,
     tanggal: data.tanggal,
@@ -479,6 +496,9 @@ export async function createWisataEvent(data: WisataEvent) {
     deskripsi: data.deskripsi,
     kategori: data.kategori
   });
+  if (error) {
+    throw new Error(`Gagal simpan agenda ke Supabase: ${error.message}`);
+  }
 }
 
 export async function updateWisataEvent(id: string, data: Partial<WisataEvent>) {
@@ -489,12 +509,18 @@ export async function updateWisataEvent(id: string, data: Partial<WisataEvent>) 
   if (data.lokasi !== undefined) payload.lokasi = data.lokasi;
   if (data.deskripsi !== undefined) payload.deskripsi = data.deskripsi;
   if (data.kategori !== undefined) payload.kategori = data.kategori;
-  await supabase.from('wisata_events').update(payload).eq('id', id);
+  const { error } = await supabase.from('wisata_events').update(payload).eq('id', id);
+  if (error) {
+    throw new Error(`Gagal update agenda di Supabase: ${error.message}`);
+  }
 }
 
 export async function deleteWisataEvent(id: string) {
   if (!supabase) return;
-  await supabase.from('wisata_events').delete().eq('id', id);
+  const { error } = await supabase.from('wisata_events').delete().eq('id', id);
+  if (error) {
+    throw new Error(`Gagal hapus agenda dari Supabase: ${error.message}`);
+  }
 }
 
 // ──────────────────────────────────────────────────

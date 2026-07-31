@@ -24,7 +24,6 @@ import {
   MapPin,
   Copy,
   Check,
-  Database,
   Mail,
   Calendar,
   Sparkles,
@@ -69,9 +68,7 @@ export const Admin: React.FC = () => {
     deleteBudaya,
     adminNotification,
     setAdminNotification,
-    clearLocalData,
-    resetToDefaultData,
-    refreshFromSupabase
+    resetToDefaultData
   } = useDusun();
 
   const [passcode, setPasscode] = useState('');
@@ -558,27 +555,8 @@ export const Admin: React.FC = () => {
               <h4 className="font-bold text-slate-900 text-sm mb-2">Petunjuk Penggunaan Panel Admin:</h4>
               <ul className="list-disc pl-5 space-y-1 text-slate-600">
                 <li>Pilih menu tab di atas untuk mengelola modul informasi, struktur pemerintahan, berita, UMKM, wisata, dan potensi alam.</li>
-                <li>Setiap perubahan yang Anda simpan akan tersimpan secara instan di penyimpanan browser (localStorage).</li>
-                <li>Jika penyimpanan lokal penuh, gunakan tombol <strong>Hapus Data Lokal</strong> untuk membersihkan cache lama.</li>
+                <li>Setiap perubahan yang Anda simpan akan tersimpan secara instan di penyimpanan browser.</li>
               </ul>
-            </div>
-
-            <div className="flex flex-wrap gap-3 pt-2 border-t border-slate-100">
-              <button
-                onClick={() => { clearLocalData(); }}
-                className="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-              >
-                <Trash2 className="w-3.5 h-3.5" /> Hapus Data Lokal
-              </button>
-              <button
-                onClick={async () => {
-                  await refreshFromSupabase();
-                  setAdminNotification({ type: 'success', message: 'Data berhasil dimuat ulang dari Supabase!' });
-                }}
-                className="bg-slate-800 hover:bg-slate-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-              >
-                <Database className="w-3.5 h-3.5" /> Refresh dari Supabase
-              </button>
             </div>
           </div>
         </div>
