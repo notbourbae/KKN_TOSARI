@@ -164,6 +164,8 @@ export const Home: React.FC = () => {
                 src={dusunInfo.sambutanFoto}
                 alt="Foto Kepala Dusun"
                 referrerPolicy="no-referrer"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -222,6 +224,8 @@ export const Home: React.FC = () => {
                   src={item.gambar}
                   alt={item.judul}
                   referrerPolicy="no-referrer"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <span className={`absolute top-3 left-3 text-[10px] font-bold px-2.5 py-0.5 rounded-full ${item.kategori === 'Pengumuman' ? 'bg-amber-500 text-slate-950' :
@@ -280,6 +284,8 @@ export const Home: React.FC = () => {
                   src={u.gambar}
                   alt={u.namaUsaha}
                   referrerPolicy="no-referrer"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover"
                 />
                 <span className="absolute top-3 left-3 bg-emerald-700 text-white font-semibold text-[10px] px-2.5 py-0.5 rounded-full">
@@ -333,6 +339,8 @@ export const Home: React.FC = () => {
                   src={w.gambar}
                   alt={w.nama}
                   referrerPolicy="no-referrer"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <span className="absolute top-3 left-3 bg-teal-700 text-white font-semibold text-[10px] px-2.5 py-0.5 rounded-full">

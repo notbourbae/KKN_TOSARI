@@ -120,6 +120,8 @@ export const Umkm: React.FC = () => {
                   src={u.gambar}
                   alt={u.namaUsaha}
                   referrerPolicy="no-referrer"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <span className="absolute top-3 left-3 bg-emerald-700 text-white font-semibold text-[10px] px-2.5 py-0.5 rounded-full shadow-xs">

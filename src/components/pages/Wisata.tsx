@@ -12,12 +12,11 @@ import {
   Clock,
   Ticket,
   Calendar,
-  Heart,
   ChevronRight
 } from 'lucide-react';
 
 export const Wisata: React.FC = () => {
-  const { wisataList, wisataEvents, setSelectedWisataModal, toggleFavoriteWisata } = useDusun();
+  const { wisataList, wisataEvents, setSelectedWisataModal } = useDusun();
 
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -109,19 +108,13 @@ export const Wisata: React.FC = () => {
                 src={w.gambar}
                 alt={w.nama}
                 referrerPolicy="no-referrer"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
               <span className="absolute top-3 left-3 bg-teal-800 text-white font-semibold text-[10px] px-2.5 py-0.5 rounded-full shadow-xs">
                 {w.kategori}
               </span>
-
-              {/* Heart favorite */}
-              <button
-                onClick={(e) => { e.stopPropagation(); toggleFavoriteWisata(w.id); }}
-                className="absolute top-3 right-3 bg-white/90 hover:bg-white p-2 rounded-full shadow-md transition-all cursor-pointer"
-              >
-                <Heart className={`w-3.5 h-3.5 ${w.favorit ? 'text-red-500 fill-red-500' : 'text-slate-600'}`} />
-              </button>
 
             </div>
 

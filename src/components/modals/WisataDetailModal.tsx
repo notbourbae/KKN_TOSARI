@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDusun } from '../../context/DusunContext';
-import { X, MapPin, Clock, Ticket, Phone, ExternalLink, Compass, CheckCircle2, Heart } from 'lucide-react';
+import { X, MapPin, Clock, Ticket, Phone, ExternalLink, Compass, CheckCircle2 } from 'lucide-react';
 
 export const WisataDetailModal: React.FC = () => {
   const { selectedWisataModal, setSelectedWisataModal, toggleFavoriteWisata } = useDusun();
@@ -14,7 +14,7 @@ export const WisataDetailModal: React.FC = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-200">
       <div className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100 max-h-[92vh] flex flex-col my-auto">
-        
+
         {/* Modal Close Button */}
         <button
           onClick={() => { setSelectedWisataModal(null); setActivePhoto(null); }}
@@ -33,15 +33,6 @@ export const WisataDetailModal: React.FC = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent"></div>
 
-          {/* Favorite button */}
-          <button
-            onClick={() => toggleFavoriteWisata(wisata.id)}
-            className="absolute top-4 left-4 bg-white/90 hover:bg-white p-2 rounded-full shadow-md transition-all cursor-pointer z-10 flex items-center gap-1 text-xs font-semibold"
-          >
-            <Heart className={`w-4 h-4 ${wisata.favorit ? 'text-red-500 fill-red-500' : 'text-slate-600'}`} />
-            <span>{wisata.favorit ? 'Favorit Saya' : 'Simpan'}</span>
-          </button>
-
           <div className="absolute bottom-4 left-4 right-4 text-white">
             <span className="inline-block bg-teal-600 text-white font-semibold text-xs px-2.5 py-0.5 rounded-full mb-1">
               {wisata.kategori}
@@ -57,9 +48,8 @@ export const WisataDetailModal: React.FC = () => {
           <div className="bg-slate-900 p-2 flex gap-2 overflow-x-auto shrink-0 border-t border-slate-800">
             <button
               onClick={() => setActivePhoto(wisata.gambar)}
-              className={`relative w-16 h-12 rounded-lg overflow-hidden shrink-0 border-2 transition-all ${
-                currentPhoto === wisata.gambar ? 'border-teal-400 scale-105' : 'border-transparent opacity-70'
-              }`}
+              className={`relative w-16 h-12 rounded-lg overflow-hidden shrink-0 border-2 transition-all ${currentPhoto === wisata.gambar ? 'border-teal-400 scale-105' : 'border-transparent opacity-70'
+                }`}
             >
               <img src={wisata.gambar} alt="Thumbnail Utm" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
             </button>
@@ -67,9 +57,8 @@ export const WisataDetailModal: React.FC = () => {
               <button
                 key={idx}
                 onClick={() => setActivePhoto(img)}
-                className={`relative w-16 h-12 rounded-lg overflow-hidden shrink-0 border-2 transition-all ${
-                  currentPhoto === img ? 'border-teal-400 scale-105' : 'border-transparent opacity-70'
-                }`}
+                className={`relative w-16 h-12 rounded-lg overflow-hidden shrink-0 border-2 transition-all ${currentPhoto === img ? 'border-teal-400 scale-105' : 'border-transparent opacity-70'
+                  }`}
               >
                 <img src={img} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
               </button>
@@ -79,7 +68,7 @@ export const WisataDetailModal: React.FC = () => {
 
         {/* Modal Scrollable Body */}
         <div className="p-6 overflow-y-auto space-y-6 text-slate-700 text-sm">
-          
+
           {/* Key Facts Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="bg-teal-50/70 p-3.5 rounded-xl border border-teal-100 flex items-start gap-3">

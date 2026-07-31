@@ -163,6 +163,8 @@ export const InformasiDusun: React.FC = () => {
                     src={dusunInfo.fotoWilayah || 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&auto=format&fit=crop&q=80'}
                     alt="Peta / Panorama Wilayah Dusun"
                     referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent flex flex-col justify-between p-3">
@@ -304,6 +306,8 @@ export const InformasiDusun: React.FC = () => {
                       src={p.foto}
                       alt={p.nama}
                       referrerPolicy="no-referrer"
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -361,6 +365,8 @@ export const InformasiDusun: React.FC = () => {
                     src={item.gambar}
                     alt={item.judul}
                     referrerPolicy="no-referrer"
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover"
                   />
                   <span className={`absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-md ${

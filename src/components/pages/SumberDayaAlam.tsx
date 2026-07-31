@@ -138,6 +138,8 @@ export const SumberDayaAlam: React.FC = () => {
                   src={sda.gambar}
                   alt={sda.nama}
                   referrerPolicy="no-referrer"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute top-3 left-3 bg-slate-900/80 text-white backdrop-blur-xs font-semibold text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1 shadow-xs border border-white/10">

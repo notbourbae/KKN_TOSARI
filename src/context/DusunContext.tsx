@@ -14,6 +14,7 @@ import {
 } from '../types';
 import {
   syncAllFromSupabase,
+  AllDusunData,
   saveDusunInfoToSupabase,
   createPejabat,
   updatePejabat as updatePejabatSupabase,
@@ -63,6 +64,45 @@ const emptyDusunInfo: DusunInfo = {
   sambutanJabatan: '',
   sambutanFoto: ''
 };
+
+// ─── Cache localStorage untuk data Supabase ──────────
+const DUSUN_CACHE_KEY = 'dusun_data_cache_v1';
+const DUSUN_CACHE_TTL = 5 * 60 * 1000; // 5 menit
+
+interface DusunCachePayload {
+  savedAt: number;
+  data: AllDusunData;
+}
+
+function readDusunCache(): { payload: AllDusunData | null; fresh: boolean } {
+  try {
+    const raw = localStorage.getItem(DUSUN_CACHE_KEY);
+    if (!raw) return { payload: null, fresh: false };
+    const parsed = JSON.parse(raw) as DusunCachePayload;
+    if (!parsed || !parsed.data) return { payload: null, fresh: false };
+    const fresh = Date.now() - parsed.savedAt < DUSUN_CACHE_TTL;
+    return { payload: parsed.data, fresh };
+  } catch {
+    return { payload: null, fresh: false };
+  }
+}
+
+function writeDusunCache(data: AllDusunData) {
+  try {
+    const payload: DusunCachePayload = { savedAt: Date.now(), data };
+    localStorage.setItem(DUSUN_CACHE_KEY, JSON.stringify(payload));
+  } catch {
+    // Kuota penuh / mode privat: abaikan
+  }
+}
+
+function invalidateDusunCache() {
+  try {
+    localStorage.removeItem(DUSUN_CACHE_KEY);
+  } catch {
+    // abaikan
+  }
+}
 
 interface DusunContextType {
   activeTab: PageTab;
@@ -183,6 +223,18 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // Hindari auto-save statistik sebelum data selesai dimuat dari Supabase
   const hasLoadedFromSupabase = React.useRef(false);
 
+  const applyAllData = React.useCallback((data: AllDusunData) => {
+    setDusunInfo(data.dusunInfo ?? emptyDusunInfo);
+    setPejabatList(data.pejabatList);
+    setBeritaList(data.beritaList);
+    setUmkmList(data.umkmList);
+    setWisataList(data.wisataList);
+    setWisataEvents(data.wisataEvents);
+    setBudayaList(data.budayaList);
+    setPotensiSDA(data.potensiSDA);
+    setStatistikProduksi(data.statistikProduksi);
+  }, []);
+
   // ─── Initial load from Supabase ───────────────────
   const loadFromSupabase = useCallback(async () => {
     if (!isSupabaseConfigured || !supabase) {
@@ -190,26 +242,31 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       setLoading(false);
       return;
     }
+    // 1) Tampilkan cache lokal dulu agar halaman langsung terisi (instan)
+    const { payload, fresh } = readDusunCache();
+    if (payload) {
+      applyAllData(payload);
+    }
+    // 2) Jika cache masih fresh, lewati panggilan jaringan
+    if (payload && fresh) {
+      hasLoadedFromSupabase.current = true;
+      setLoading(false);
+      return;
+    }
+    // 3) Fetch dari Supabase di background, lalu update state & cache
     try {
       const data = await syncAllFromSupabase();
       hasLoadedFromSupabase.current = true;
       if (data) {
-        setDusunInfo(data.dusunInfo ?? emptyDusunInfo);
-        setPejabatList(data.pejabatList);
-        setBeritaList(data.beritaList);
-        setUmkmList(data.umkmList);
-        setWisataList(data.wisataList);
-        setWisataEvents(data.wisataEvents);
-        setBudayaList(data.budayaList);
-        setPotensiSDA(data.potensiSDA);
-        setStatistikProduksi(data.statistikProduksi);
+        applyAllData(data);
+        writeDusunCache(data);
       }
     } catch (err) {
       console.warn('Gagal sync dari Supabase:', err);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [applyAllData]);
 
   useEffect(() => {
     loadFromSupabase();
@@ -228,6 +285,7 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
     try {
       await saveDusunInfoToSupabase(dusunInfo);
+      invalidateDusunCache();
       alert('✅ Data profil dusun berhasil disimpan ke database Supabase!');
     } catch (err) {
       console.error('Gagal simpan profil dusun ke Supabase:', err);
@@ -247,6 +305,7 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   // ─── Actions with Supabase sync ──────────────────
 
   const addPejabat = (data: Omit<PejabatDusun, 'id'>) => {
+    invalidateDusunCache();
     const newItem: PejabatDusun = {
       ...data,
       id: 'pj_' + Date.now()
@@ -258,6 +317,7 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const updatePejabat = (id: string, data: Partial<PejabatDusun>) => {
+    invalidateDusunCache();
     setPejabatList(prev => prev.map(p => p.id === id ? { ...p, ...data } : p));
     if (isSupabaseConfigured && supabase) {
       updatePejabatSupabase(id, data).catch(err => console.error('Gagal update pejabat di Supabase:', err));
@@ -265,6 +325,7 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const deletePejabat = (id: string) => {
+    invalidateDusunCache();
     setPejabatList(prev => prev.filter(p => p.id !== id));
     if (isSupabaseConfigured && supabase) {
       deletePejabatSupabase(id).catch(err => console.error('Gagal hapus pejabat dari Supabase:', err));
@@ -272,6 +333,7 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const addBerita = (newItem: Omit<BeritaItem, 'id' | 'dibaca'>) => {
+    invalidateDusunCache();
     const created: BeritaItem = {
       ...newItem,
       id: 'b_' + Date.now(),
@@ -284,11 +346,13 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const updateBerita = (id: string, data: Partial<BeritaItem>) => {
+    invalidateDusunCache();
     setBeritaList(prev => prev.map(b => b.id === id ? { ...b, ...data } : b));
     // No Supabase update for berita yet
   };
 
   const deleteBerita = (id: string) => {
+    invalidateDusunCache();
     setBeritaList(prev => prev.filter(b => b.id !== id));
     if (isSupabaseConfigured && supabase) {
       deleteBeritaSupabase(id).catch(err => console.error('Gagal hapus berita dari Supabase:', err));
@@ -324,12 +388,14 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
 
     setUmkmList(prev => [newUmkm, ...prev]);
+    invalidateDusunCache();
     if (isSupabaseConfigured && supabase) {
       createUmkm(newUmkm).catch(err => console.error('Gagal simpan UMKM ke Supabase:', err));
     }
   };
 
   const approveUmkm = (id: string) => {
+    invalidateDusunCache();
     setUmkmList(prev => prev.map(u => u.id === id ? { ...u, status: 'disetujui' } : u));
     if (isSupabaseConfigured && supabase) {
       updateUmkmSupabase(id, { status: 'disetujui' }).catch(err => console.error('Gagal update UMKM di Supabase:', err));
@@ -337,6 +403,7 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const rejectUmkm = (id: string) => {
+    invalidateDusunCache();
     setUmkmList(prev => prev.map(u => u.id === id ? { ...u, status: 'ditolak' } : u));
     if (isSupabaseConfigured && supabase) {
       updateUmkmSupabase(id, { status: 'ditolak' }).catch(err => console.error('Gagal update UMKM di Supabase:', err));
@@ -344,6 +411,7 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const updateUmkm = (id: string, data: Partial<UmkmItem>) => {
+    invalidateDusunCache();
     setUmkmList(prev => prev.map(u => u.id === id ? { ...u, ...data } : u));
     if (isSupabaseConfigured && supabase) {
       updateUmkmSupabase(id, data).catch(err => console.error('Gagal update UMKM di Supabase:', err));
@@ -351,6 +419,7 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const deleteUmkm = (id: string) => {
+    invalidateDusunCache();
     setUmkmList(prev => prev.filter(u => u.id !== id));
     if (isSupabaseConfigured && supabase) {
       deleteUmkmSupabase(id).catch(err => console.error('Gagal hapus UMKM dari Supabase:', err));
@@ -364,12 +433,14 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       rating: 5.0
     };
     setWisataList(prev => [newItem, ...prev]);
+    invalidateDusunCache();
     if (isSupabaseConfigured && supabase) {
       createWisata(newItem).catch(err => console.error('Gagal simpan wisata ke Supabase:', err));
     }
   };
 
   const updateWisata = (id: string, data: Partial<WisataItem>) => {
+    invalidateDusunCache();
     setWisataList(prev => prev.map(w => w.id === id ? { ...w, ...data } : w));
     if (isSupabaseConfigured && supabase) {
       updateWisataSupabase(id, data).catch(err => {
@@ -380,6 +451,7 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const deleteWisata = (id: string) => {
+    invalidateDusunCache();
     setWisataList(prev => prev.filter(w => w.id !== id));
     if (isSupabaseConfigured && supabase) {
       deleteWisataSupabase(id).catch(err => console.error('Gagal hapus wisata dari Supabase:', err));
@@ -387,6 +459,7 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const toggleFavoriteWisata = (id: string) => {
+    invalidateDusunCache();
     setWisataList(prev => prev.map(w => w.id === id ? { ...w, favorit: !w.favorit } : w));
   };
 
@@ -396,6 +469,7 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       id: 'e_' + Date.now()
     };
     setWisataEvents(prev => [newEv, ...prev]);
+    invalidateDusunCache();
     if (isSupabaseConfigured && supabase) {
       createWisataEvent(newEv).catch(err => {
         console.error('Gagal simpan event ke Supabase:', err);
@@ -405,6 +479,7 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const updateWisataEvent = (id: string, data: Partial<WisataEvent>) => {
+    invalidateDusunCache();
     setWisataEvents(prev => prev.map(e => e.id === id ? { ...e, ...data } : e));
     if (isSupabaseConfigured && supabase) {
       updateWisataEventSupabase(id, data).catch(err => {
@@ -415,6 +490,7 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const deleteWisataEvent = (id: string) => {
+    invalidateDusunCache();
     setWisataEvents(prev => prev.filter(e => e.id !== id));
     if (isSupabaseConfigured && supabase) {
       deleteWisataEventSupabase(id).catch(err => {
@@ -430,6 +506,7 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       id: 'bdy_' + Date.now()
     };
     setBudayaList(prev => [newItem, ...prev]);
+    invalidateDusunCache();
     if (isSupabaseConfigured && supabase) {
       createBudaya(newItem).catch(err => {
         console.error('Gagal simpan budaya ke Supabase:', err);
@@ -439,6 +516,7 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const updateBudaya = (id: string, data: Partial<BudayaItem>) => {
+    invalidateDusunCache();
     setBudayaList(prev => prev.map(b => b.id === id ? { ...b, ...data } : b));
     if (isSupabaseConfigured && supabase) {
       updateBudayaSupabase(id, data).catch(err => {
@@ -449,6 +527,7 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const deleteBudaya = (id: string) => {
+    invalidateDusunCache();
     setBudayaList(prev => prev.filter(b => b.id !== id));
     if (isSupabaseConfigured && supabase) {
       deleteBudayaSupabase(id).catch(err => {
@@ -464,17 +543,20 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       id: 'sda_' + Date.now()
     };
     setPotensiSDA(prev => [newItem, ...prev]);
+    invalidateDusunCache();
     if (isSupabaseConfigured && supabase) {
       createPotensiSDA(newItem).catch(err => console.error('Gagal simpan SDA ke Supabase:', err));
     }
   };
 
   const updatePotensiSDA = (id: string, data: Partial<PotensiSDA>) => {
+    invalidateDusunCache();
     setPotensiSDA(prev => prev.map(s => s.id === id ? { ...s, ...data } : s));
     // No Supabase update for SDA yet
   };
 
   const deletePotensiSDA = (id: string) => {
+    invalidateDusunCache();
     setPotensiSDA(prev => prev.filter(s => s.id !== id));
     if (isSupabaseConfigured && supabase) {
       deletePotensiSDASupabase(id).catch(err => console.error('Gagal hapus SDA dari Supabase:', err));
