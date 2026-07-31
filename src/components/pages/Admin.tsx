@@ -67,8 +67,7 @@ export const Admin: React.FC = () => {
     updateBudaya,
     deleteBudaya,
     adminNotification,
-    setAdminNotification,
-    resetToDefaultData
+    setAdminNotification
   } = useDusun();
 
   const [passcode, setPasscode] = useState('');

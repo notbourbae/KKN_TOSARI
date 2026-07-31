@@ -13,17 +13,6 @@ import {
   BudayaItem
 } from '../types';
 import {
-  initialDusunInfo,
-  initialPejabat,
-  initialBerita,
-  initialUmkm,
-  initialWisata,
-  initialWisataEvents,
-  initialBudaya,
-  initialPotensiSDA,
-  initialStatistikProduksi
-} from '../data/initialData';
-import {
   syncAllFromSupabase,
   saveDusunInfoToSupabase,
   createPejabat,
@@ -49,22 +38,30 @@ import {
   supabase
 } from '../lib/supabase';
 
-function setLocalStorage(key: string, value: unknown) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    console.warn('localStorage penuh: tidak bisa menyimpan ' + key + '. Hapus data lama jika perlu.');
-  }
-}
-
-function getLocalStorage<T>(key: string, fallback: T): T {
-  try {
-    const saved = localStorage.getItem(key);
-    return saved ? JSON.parse(saved) : fallback;
-  } catch {
-    return fallback;
-  }
-}
+const emptyDusunInfo: DusunInfo = {
+  namaDusun: '',
+  desa: '',
+  kecamatan: '',
+  kabupaten: '',
+  provinsi: '',
+  kodePos: '',
+  kepalaDusun: '',
+  teleponDusun: '',
+  emailDusun: '',
+  alamatKantor: '',
+  luasWilayah: '',
+  jumlahPenduduk: 0,
+  jumlahKK: 0,
+  slogan: '',
+  fotoWilayah: '',
+  sejarah: { tahunBerdiri: '', pendiri: '', cerita: '', milestone: [] },
+  visi: '',
+  misi: [],
+  sambutanJudul: '',
+  sambutanIsi: '',
+  sambutanJabatan: '',
+  sambutanFoto: ''
+};
 
 interface DusunContextType {
   activeTab: PageTab;
@@ -131,14 +128,11 @@ interface DusunContextType {
   showUmkmRegisterModal: boolean;
   setShowUmkmRegisterModal: (show: boolean) => void;
 
-  resetToDefaultData: () => void;
-
   // Supabase integration
   loading: boolean;
   refreshFromSupabase: () => Promise<void>;
   saveDusunInfoToSupabaseAction: () => Promise<void>;
 
-  clearLocalData: () => void;
   adminNotification: { type: 'success' | 'error'; message: string } | null;
   setAdminNotification: (n: { type: 'success' | 'error'; message: string } | null) => void;
 }
@@ -151,24 +145,24 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const [loading, setLoading] = useState(true);
 
-  // Local storage state initialization with fallbacks
-  const [dusunInfo, setDusunInfo] = useState<DusunInfo>(() => getLocalStorage('dusun_info_v1', initialDusunInfo));
+  // Data hanya bersumber dari database Supabase (nilai awal kosong)
+  const [dusunInfo, setDusunInfo] = useState<DusunInfo>(emptyDusunInfo);
 
-  const [pejabatList, setPejabatList] = useState<PejabatDusun[]>(() => getLocalStorage('dusun_pejabat_v1', initialPejabat));
+  const [pejabatList, setPejabatList] = useState<PejabatDusun[]>([]);
 
-  const [beritaList, setBeritaList] = useState<BeritaItem[]>(() => getLocalStorage('dusun_berita_v1', initialBerita));
+  const [beritaList, setBeritaList] = useState<BeritaItem[]>([]);
 
-  const [umkmList, setUmkmList] = useState<UmkmItem[]>(() => getLocalStorage('dusun_umkm_v1', initialUmkm));
+  const [umkmList, setUmkmList] = useState<UmkmItem[]>([]);
 
-  const [wisataList, setWisataList] = useState<WisataItem[]>(() => getLocalStorage('dusun_wisata_v1', initialWisata));
+  const [wisataList, setWisataList] = useState<WisataItem[]>([]);
 
-  const [wisataEvents, setWisataEvents] = useState<WisataEvent[]>(() => getLocalStorage('dusun_wisata_events_v1', initialWisataEvents));
+  const [wisataEvents, setWisataEvents] = useState<WisataEvent[]>([]);
 
-  const [budayaList, setBudayaList] = useState<BudayaItem[]>(() => getLocalStorage('dusun_budaya_v1', initialBudaya));
+  const [budayaList, setBudayaList] = useState<BudayaItem[]>([]);
 
-  const [potensiSDA, setPotensiSDA] = useState<PotensiSDA[]>(() => getLocalStorage('dusun_sda_v1', initialPotensiSDA));
+  const [potensiSDA, setPotensiSDA] = useState<PotensiSDA[]>([]);
 
-  const [statistikProduksi, setStatistikProduksi] = useState<StatistikProduksi[]>(() => getLocalStorage('dusun_statistik_v1', initialStatistikProduksi));
+  const [statistikProduksi, setStatistikProduksi] = useState<StatistikProduksi[]>([]);
 
   const [isAdmin, setIsAdmin] = useState<boolean>(() => localStorage.getItem('dusun_is_admin_v1') === 'true');
 
@@ -179,66 +173,35 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [showUmkmRegisterModal, setShowUmkmRegisterModal] = useState(false);
   const [adminNotification, setAdminNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  // Sync to local storage
-  useEffect(() => { setLocalStorage('dusun_info_v1', dusunInfo); }, [dusunInfo]);
-  useEffect(() => { setLocalStorage('dusun_pejabat_v1', pejabatList); }, [pejabatList]);
-  useEffect(() => { setLocalStorage('dusun_berita_v1', beritaList); }, [beritaList]);
-  useEffect(() => { setLocalStorage('dusun_umkm_v1', umkmList); }, [umkmList]);
-  useEffect(() => { setLocalStorage('dusun_wisata_v1', wisataList); }, [wisataList]);
-  useEffect(() => { setLocalStorage('dusun_wisata_events_v1', wisataEvents); }, [wisataEvents]);
-  useEffect(() => { setLocalStorage('dusun_budaya_v1', budayaList); }, [budayaList]);
-  useEffect(() => { setLocalStorage('dusun_sda_v1', potensiSDA); }, [potensiSDA]);
-  useEffect(() => { setLocalStorage('dusun_statistik_v1', statistikProduksi); }, [statistikProduksi]);
+  // Admin login status disimpan di browser (status sesi, bukan konten)
   useEffect(() => { try { localStorage.setItem('dusun_is_admin_v1', String(isAdmin)); } catch {} }, [isAdmin]);
+
+  // Hindari auto-save statistik sebelum data selesai dimuat dari Supabase
+  const hasLoadedFromSupabase = React.useRef(false);
 
   // ─── Initial load from Supabase ───────────────────
   const loadFromSupabase = useCallback(async () => {
     if (!isSupabaseConfigured || !supabase) {
+      hasLoadedFromSupabase.current = true;
       setLoading(false);
       return;
     }
     try {
       const data = await syncAllFromSupabase();
+      hasLoadedFromSupabase.current = true;
       if (data) {
-        if (data.dusunInfo) {
-          setDusunInfo(data.dusunInfo);
-          setLocalStorage('dusun_info_v1', data.dusunInfo);
-        }
-        if (data.pejabatList.length > 0) {
-          setPejabatList(data.pejabatList);
-          setLocalStorage('dusun_pejabat_v1', data.pejabatList);
-        }
-        if (data.beritaList.length > 0) {
-          setBeritaList(data.beritaList);
-          setLocalStorage('dusun_berita_v1', data.beritaList);
-        }
-        if (data.umkmList.length > 0) {
-          setUmkmList(data.umkmList);
-          setLocalStorage('dusun_umkm_v1', data.umkmList);
-        }
-        if (data.wisataList.length > 0) {
-          setWisataList(data.wisataList);
-          setLocalStorage('dusun_wisata_v1', data.wisataList);
-        }
-        if (data.wisataEvents.length > 0) {
-          setWisataEvents(data.wisataEvents);
-          setLocalStorage('dusun_wisata_events_v1', data.wisataEvents);
-        }
-        if (data.budayaList.length > 0) {
-          setBudayaList(data.budayaList);
-          setLocalStorage('dusun_budaya_v1', data.budayaList);
-        }
-        if (data.potensiSDA.length > 0) {
-          setPotensiSDA(data.potensiSDA);
-          setLocalStorage('dusun_sda_v1', data.potensiSDA);
-        }
-        if (data.statistikProduksi.length > 0) {
-          setStatistikProduksi(data.statistikProduksi);
-          setLocalStorage('dusun_statistik_v1', data.statistikProduksi);
-        }
+        setDusunInfo(data.dusunInfo ?? emptyDusunInfo);
+        setPejabatList(data.pejabatList);
+        setBeritaList(data.beritaList);
+        setUmkmList(data.umkmList);
+        setWisataList(data.wisataList);
+        setWisataEvents(data.wisataEvents);
+        setBudayaList(data.budayaList);
+        setPotensiSDA(data.potensiSDA);
+        setStatistikProduksi(data.statistikProduksi);
       }
     } catch (err) {
-      console.warn('Gagal sync dari Supabase, pakai cache lokal:', err);
+      console.warn('Gagal sync dari Supabase:', err);
     } finally {
       setLoading(false);
     }
@@ -509,41 +472,12 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
-  // Sync statistik to Supabase when it changes
+  // Sync statistik ke Supabase setelah data berhasil dimuat
   useEffect(() => {
-    if (isSupabaseConfigured && supabase) {
+    if (hasLoadedFromSupabase.current && isSupabaseConfigured && supabase) {
       saveStatistikProduksi(statistikProduksi).catch(err => console.error('Gagal simpan statistik ke Supabase:', err));
     }
   }, [statistikProduksi]);
-
-  const resetToDefaultData = () => {
-    if (window.confirm('Apakah Anda yakin ingin mengembalikan semua data ke pengaturan awal?')) {
-      setDusunInfo(initialDusunInfo);
-      setPejabatList(initialPejabat);
-      setBeritaList(initialBerita);
-      setUmkmList(initialUmkm);
-      setWisataList(initialWisata);
-      setWisataEvents(initialWisataEvents);
-      setBudayaList(initialBudaya);
-      setPotensiSDA(initialPotensiSDA);
-      setStatistikProduksi(initialStatistikProduksi);
-      localStorage.clear();
-      window.location.reload();
-    }
-  };
-
-  const clearLocalData = () => {
-    const keysToRemove: string[] = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('dusun_')) {
-        keysToRemove.push(key);
-      }
-    }
-    keysToRemove.forEach(k => localStorage.removeItem(k));
-    setAdminNotification({ type: 'success', message: 'Data lokal berhasil dibersihkan. Muat ulang halaman untuk melihat perubahan.' });
-    setTimeout(() => window.location.reload(), 1500);
-  };
 
   return (
     <DusunContext.Provider
@@ -601,11 +535,9 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setSelectedBeritaModal,
         showUmkmRegisterModal,
         setShowUmkmRegisterModal,
-        resetToDefaultData,
         loading,
         refreshFromSupabase,
         saveDusunInfoToSupabaseAction,
-        clearLocalData,
         adminNotification,
         setAdminNotification
       }}
