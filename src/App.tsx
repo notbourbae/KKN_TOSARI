@@ -19,18 +19,7 @@ import { BeritaDetailModal } from './components/modals/BeritaDetailModal';
 import { UmkmRegisterModal } from './components/modals/UmkmRegisterModal';
 
 const MainContent: React.FC = () => {
-  const { activeTab, loading } = useDusun();
-
-  if (loading) {
-    return (
-      <div className="relative min-h-screen font-sans text-slate-800 flex items-center justify-center selection:bg-emerald-200 selection:text-emerald-950">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin" />
-          <p className="text-sm text-slate-500 font-medium">Memuat data dari database...</p>
-        </div>
-      </div>
-    );
-  }
+  const { activeTab } = useDusun();
 
   return (
     <div className="relative min-h-screen font-sans text-slate-800 flex flex-col justify-between selection:bg-emerald-200 selection:text-emerald-950">
