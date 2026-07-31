@@ -39,8 +39,11 @@ import {
   createPotensiSDA,
   deletePotensiSDA as deletePotensiSDASupabase,
   createWisataEvent,
+  updateWisataEvent as updateWisataEventSupabase,
+  deleteWisataEvent as deleteWisataEventSupabase,
   saveStatistikProduksi,
   createBudaya,
+  updateBudaya as updateBudayaSupabase,
   deleteBudaya as deleteBudayaSupabase,
   isSupabaseConfigured,
   supabase
@@ -97,10 +100,13 @@ interface DusunContextType {
 
   budayaList: BudayaItem[];
   addBudaya: (budaya: Omit<BudayaItem, 'id'>) => void;
+  updateBudaya: (id: string, data: Partial<BudayaItem>) => void;
   deleteBudaya: (id: string) => void;
 
   wisataEvents: WisataEvent[];
   addWisataEvent: (event: Omit<WisataEvent, 'id'>) => void;
+  updateWisataEvent: (id: string, data: Partial<WisataEvent>) => void;
+  deleteWisataEvent: (id: string) => void;
 
   potensiSDA: PotensiSDA[];
   addPotensiSDA: (sda: Omit<PotensiSDA, 'id'>) => void;
@@ -131,6 +137,10 @@ interface DusunContextType {
   loading: boolean;
   refreshFromSupabase: () => Promise<void>;
   saveDusunInfoToSupabaseAction: () => Promise<void>;
+
+  clearLocalData: () => void;
+  adminNotification: { type: 'success' | 'error'; message: string } | null;
+  setAdminNotification: (n: { type: 'success' | 'error'; message: string } | null) => void;
 }
 
 const DusunContext = createContext<DusunContextType | undefined>(undefined);
@@ -167,6 +177,7 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [selectedWisataModal, setSelectedWisataModal] = useState<WisataItem | null>(null);
   const [selectedBeritaModal, setSelectedBeritaModal] = useState<BeritaItem | null>(null);
   const [showUmkmRegisterModal, setShowUmkmRegisterModal] = useState(false);
+  const [adminNotification, setAdminNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Sync to local storage
   useEffect(() => { setLocalStorage('dusun_info_v1', dusunInfo); }, [dusunInfo]);
@@ -414,7 +425,30 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
     setWisataEvents(prev => [newEv, ...prev]);
     if (isSupabaseConfigured && supabase) {
-      createWisataEvent(newEv).catch(err => console.error('Gagal simpan event ke Supabase:', err));
+      createWisataEvent(newEv).catch(err => {
+        console.error('Gagal simpan event ke Supabase:', err);
+        setAdminNotification({ type: 'error', message: 'Data tersimpan lokal, tapi gagal sync ke Supabase. Periksa tabel wisata_events di database.' });
+      });
+    }
+  };
+
+  const updateWisataEvent = (id: string, data: Partial<WisataEvent>) => {
+    setWisataEvents(prev => prev.map(e => e.id === id ? { ...e, ...data } : e));
+    if (isSupabaseConfigured && supabase) {
+      updateWisataEventSupabase(id, data).catch(err => {
+        console.error('Gagal update event ke Supabase:', err);
+        setAdminNotification({ type: 'error', message: 'Data terupdate lokal, tapi gagal sync ke Supabase.' });
+      });
+    }
+  };
+
+  const deleteWisataEvent = (id: string) => {
+    setWisataEvents(prev => prev.filter(e => e.id !== id));
+    if (isSupabaseConfigured && supabase) {
+      deleteWisataEventSupabase(id).catch(err => {
+        console.error('Gagal hapus event dari Supabase:', err);
+        setAdminNotification({ type: 'error', message: 'Data terhapus lokal, tapi gagal sync ke Supabase.' });
+      });
     }
   };
 
@@ -425,14 +459,30 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
     setBudayaList(prev => [newItem, ...prev]);
     if (isSupabaseConfigured && supabase) {
-      createBudaya(newItem).catch(err => console.error('Gagal simpan budaya ke Supabase:', err));
+      createBudaya(newItem).catch(err => {
+        console.error('Gagal simpan budaya ke Supabase:', err);
+        setAdminNotification({ type: 'error', message: 'Data budaya tersimpan lokal, tapi gagal sync ke Supabase. Pastikan tabel "budaya" sudah dibuat di database.' });
+      });
+    }
+  };
+
+  const updateBudaya = (id: string, data: Partial<BudayaItem>) => {
+    setBudayaList(prev => prev.map(b => b.id === id ? { ...b, ...data } : b));
+    if (isSupabaseConfigured && supabase) {
+      updateBudayaSupabase(id, data).catch(err => {
+        console.error('Gagal update budaya ke Supabase:', err);
+        setAdminNotification({ type: 'error', message: 'Data budaya terupdate lokal, tapi gagal sync ke Supabase.' });
+      });
     }
   };
 
   const deleteBudaya = (id: string) => {
     setBudayaList(prev => prev.filter(b => b.id !== id));
     if (isSupabaseConfigured && supabase) {
-      deleteBudayaSupabase(id).catch(err => console.error('Gagal hapus budaya dari Supabase:', err));
+      deleteBudayaSupabase(id).catch(err => {
+        console.error('Gagal hapus budaya dari Supabase:', err);
+        setAdminNotification({ type: 'error', message: 'Data budaya terhapus lokal, tapi gagal sync ke Supabase.' });
+      });
     }
   };
 
@@ -482,6 +532,19 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
+  const clearLocalData = () => {
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('dusun_')) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach(k => localStorage.removeItem(k));
+    setAdminNotification({ type: 'success', message: 'Data lokal berhasil dibersihkan. Muat ulang halaman untuk melihat perubahan.' });
+    setTimeout(() => window.location.reload(), 1500);
+  };
+
   return (
     <DusunContext.Provider
       value={{
@@ -513,8 +576,11 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         toggleFavoriteWisata,
         wisataEvents,
         addWisataEvent,
+        updateWisataEvent,
+        deleteWisataEvent,
         budayaList,
         addBudaya,
+        updateBudaya,
         deleteBudaya,
         potensiSDA,
         addPotensiSDA,
@@ -538,7 +604,10 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         resetToDefaultData,
         loading,
         refreshFromSupabase,
-        saveDusunInfoToSupabaseAction
+        saveDusunInfoToSupabaseAction,
+        clearLocalData,
+        adminNotification,
+        setAdminNotification
       }}
     >
       {children}

@@ -481,6 +481,22 @@ export async function createWisataEvent(data: WisataEvent) {
   });
 }
 
+export async function updateWisataEvent(id: string, data: Partial<WisataEvent>) {
+  if (!supabase) return;
+  const payload: Record<string, unknown> = {};
+  if (data.judul !== undefined) payload.judul = data.judul;
+  if (data.tanggal !== undefined) payload.tanggal = data.tanggal;
+  if (data.lokasi !== undefined) payload.lokasi = data.lokasi;
+  if (data.deskripsi !== undefined) payload.deskripsi = data.deskripsi;
+  if (data.kategori !== undefined) payload.kategori = data.kategori;
+  await supabase.from('wisata_events').update(payload).eq('id', id);
+}
+
+export async function deleteWisataEvent(id: string) {
+  if (!supabase) return;
+  await supabase.from('wisata_events').delete().eq('id', id);
+}
+
 // ──────────────────────────────────────────────────
 // POTENSI SDA
 // ──────────────────────────────────────────────────
@@ -537,6 +553,20 @@ export async function saveStatistikProduksi(list: StatistikProduksi[]) {
 // BUDAYA
 // ──────────────────────────────────────────────────
 
+/*
+SQL untuk membuat tabel budaya di Supabase Dashboard (SQL Editor):
+
+CREATE TABLE budaya (
+  id TEXT PRIMARY KEY,
+  nama TEXT NOT NULL DEFAULT '',
+  kategori TEXT NOT NULL DEFAULT 'Kesenian',
+  deskripsi TEXT NOT NULL DEFAULT '',
+  gambar TEXT NOT NULL DEFAULT '',
+  lokasi TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'aktif' CHECK (status IN ('aktif', 'lestari'))
+);
+*/
+
 export async function createBudaya(data: BudayaItem) {
   if (!supabase) return;
   await supabase.from('budaya').insert({
@@ -548,6 +578,18 @@ export async function createBudaya(data: BudayaItem) {
     lokasi: data.lokasi,
     status: data.status
   });
+}
+
+export async function updateBudaya(id: string, data: Partial<BudayaItem>) {
+  if (!supabase) return;
+  const payload: Record<string, unknown> = {};
+  if (data.nama !== undefined) payload.nama = data.nama;
+  if (data.kategori !== undefined) payload.kategori = data.kategori;
+  if (data.deskripsi !== undefined) payload.deskripsi = data.deskripsi;
+  if (data.gambar !== undefined) payload.gambar = data.gambar;
+  if (data.lokasi !== undefined) payload.lokasi = data.lokasi;
+  if (data.status !== undefined) payload.status = data.status;
+  await supabase.from('budaya').update(payload).eq('id', id);
 }
 
 export async function deleteBudaya(id: string) {

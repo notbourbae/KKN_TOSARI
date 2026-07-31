@@ -28,9 +28,10 @@ import {
   Mail,
   Calendar,
   Sparkles,
-  Quote
+  Quote,
+  Landmark
 } from 'lucide-react';
-import { BeritaItem, UmkmItem, WisataItem, WisataEvent, PotensiSDA, PejabatDusun } from '../../types';
+import { BeritaItem, UmkmItem, WisataItem, WisataEvent, PotensiSDA, PejabatDusun, BudayaItem } from '../../types';
 import { ImageUploader } from '../ImageUploader';
 
 export const Admin: React.FC = () => {
@@ -61,12 +62,73 @@ export const Admin: React.FC = () => {
     deleteWisataEvent,
     potensiSDA,
     addPotensiSDA,
-    deletePotensiSDA
+    deletePotensiSDA,
+    budayaList,
+    addBudaya,
+    updateBudaya,
+    deleteBudaya,
+    adminNotification,
+    setAdminNotification,
+    clearLocalData,
+    resetToDefaultData,
+    refreshFromSupabase
   } = useDusun();
 
   const [passcode, setPasscode] = useState('');
   const [loginError, setLoginError] = useState(false);
-  const [adminTab, setAdminTab] = useState<'dashboard' | 'informasi' | 'struktur' | 'berita' | 'umkm' | 'wisata' | 'sda' | 'agenda' | 'pengguna'>('dashboard');
+  const [adminTab, setAdminTab] = useState<'dashboard' | 'informasi' | 'struktur' | 'berita' | 'umkm' | 'wisata' | 'sda' | 'agenda' | 'budaya' | 'pengguna'>('dashboard');
+
+  // Budaya Form State
+  const [newBudayaName, setNewBudayaName] = useState('');
+  const [newBudayaCat, setNewBudayaCat] = useState('Kesenian');
+  const [newBudayaDesc, setNewBudayaDesc] = useState('');
+  const [newBudayaLokasi, setNewBudayaLokasi] = useState('Dusun Tosari');
+  const [newBudayaImg, setNewBudayaImg] = useState('');
+  const [newBudayaStatus, setNewBudayaStatus] = useState<'aktif' | 'lestari'>('aktif');
+
+  const [editingBudayaId, setEditingBudayaId] = useState<string | null>(null);
+  const [editBudayaForm, setEditBudayaForm] = useState<BudayaItem | null>(null);
+
+  const handleCreateBudaya = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newBudayaName || !newBudayaDesc) return;
+
+    addBudaya({
+      nama: newBudayaName,
+      kategori: newBudayaCat,
+      deskripsi: newBudayaDesc,
+      lokasi: newBudayaLokasi || 'Dusun Tosari',
+      gambar: newBudayaImg || 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=800&auto=format&fit=crop&q=80',
+      status: newBudayaStatus
+    });
+
+    setNewBudayaName('');
+    setNewBudayaDesc('');
+    setNewBudayaLokasi('Dusun Tosari');
+    setNewBudayaImg('');
+    alert('Warisan budaya baru berhasil ditambahkan!');
+  };
+
+  const startEditBudaya = (item: BudayaItem) => {
+    setEditingBudayaId(item.id);
+    setEditBudayaForm({ ...item });
+  };
+
+  const handleSaveEditBudaya = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingBudayaId || !editBudayaForm) return;
+
+    updateBudaya(editingBudayaId, editBudayaForm);
+    setEditingBudayaId(null);
+    setEditBudayaForm(null);
+    alert('Data budaya berhasil diperbarui!');
+  };
+
+  const handleDeleteBudaya = (id: string, nama: string) => {
+    if (window.confirm(`Apakah Anda yakin ingin menghapus budaya "${nama}"?`)) {
+      deleteBudaya(id);
+    }
+  };
   const [copiedSql, setCopiedSql] = useState(false);
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
 
@@ -337,6 +399,16 @@ export const Admin: React.FC = () => {
         </button>
       </div>
 
+      {/* Notification Banner */}
+      {adminNotification && (
+        <div className={`p-4 rounded-2xl text-xs font-bold flex items-center justify-between ${adminNotification.type === 'error' ? 'bg-red-100 text-red-800 border border-red-200' : 'bg-emerald-100 text-emerald-800 border border-emerald-200'}`}>
+          <span>{adminNotification.message}</span>
+          <button onClick={() => setAdminNotification(null)} className="ml-2 p-1 hover:opacity-70 cursor-pointer">
+            <XCircle className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Admin Navigation Tabs */}
       <div className="bg-white p-2 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-1 overflow-x-auto">
         <button
@@ -410,6 +482,15 @@ export const Admin: React.FC = () => {
           <Trees className="w-4 h-4" />
           Kelola Potensi SDA ({potensiSDA.length})
         </button>
+
+        <button
+          onClick={() => setAdminTab('budaya')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${adminTab === 'budaya' ? 'bg-slate-900 text-amber-400' : 'text-slate-700 hover:bg-slate-100'
+            }`}
+        >
+          <Landmark className="w-4 h-4" />
+          Kelola Budaya ({budayaList.length})
+        </button>
       </div>
 
       {/* ADMIN TAB 1: DASHBOARD STATS OVERVIEW */}
@@ -478,7 +559,26 @@ export const Admin: React.FC = () => {
               <ul className="list-disc pl-5 space-y-1 text-slate-600">
                 <li>Pilih menu tab di atas untuk mengelola modul informasi, struktur pemerintahan, berita, UMKM, wisata, dan potensi alam.</li>
                 <li>Setiap perubahan yang Anda simpan akan tersimpan secara instan di penyimpanan browser (localStorage).</li>
+                <li>Jika penyimpanan lokal penuh, gunakan tombol <strong>Hapus Data Lokal</strong> untuk membersihkan cache lama.</li>
               </ul>
+            </div>
+
+            <div className="flex flex-wrap gap-3 pt-2 border-t border-slate-100">
+              <button
+                onClick={() => { clearLocalData(); }}
+                className="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5" /> Hapus Data Lokal
+              </button>
+              <button
+                onClick={async () => {
+                  await refreshFromSupabase();
+                  setAdminNotification({ type: 'success', message: 'Data berhasil dimuat ulang dari Supabase!' });
+                }}
+                className="bg-slate-800 hover:bg-slate-700 text-white font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <Database className="w-3.5 h-3.5" /> Refresh dari Supabase
+              </button>
             </div>
           </div>
         </div>
@@ -1670,6 +1770,317 @@ export const Admin: React.FC = () => {
                     <MapPin className="w-3.5 h-3.5 text-teal-400" /> {ev.lokasi}
                   </p>
                   <p className="text-[11px] text-slate-400 pt-2 border-t border-slate-700">{ev.deskripsi}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* ADMIN TAB 8: KELOLA WARISAN BUDAYA & TRADISI */}
+      {adminTab === 'budaya' && (
+        <div className="space-y-8 text-xs text-slate-800 animate-in fade-in duration-200">
+
+          {/* Modal Edit Budaya */}
+          {editingBudayaId && editBudayaForm && (
+            <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+              <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-xl w-full border border-slate-200 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2 text-slate-900 font-bold text-base">
+                    <Landmark className="w-5 h-5 text-amber-700" />
+                    <span>Edit Warisan Budaya & Tradisi</span>
+                  </div>
+                  <button
+                    onClick={() => { setEditingBudayaId(null); setEditBudayaForm(null); }}
+                    className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                  >
+                    <XCircle className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleSaveEditBudaya} className="space-y-4">
+                  <div>
+                    <label className="block font-bold mb-1">Nama Budaya / Tradisi</label>
+                    <input
+                      type="text"
+                      required
+                      value={editBudayaForm.nama}
+                      onChange={e => setEditBudayaForm({ ...editBudayaForm, nama: e.target.value })}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-bold mb-1">Kategori Budaya</label>
+                      <select
+                        value={editBudayaForm.kategori}
+                        onChange={e => setEditBudayaForm({ ...editBudayaForm, kategori: e.target.value })}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5"
+                      >
+                        <option value="Kesenian">Kesenian</option>
+                        <option value="Tarian Tradisional">Tarian Tradisional</option>
+                        <option value="Upacara Adat">Upacara Adat</option>
+                        <option value="Kerajinan Tradisional">Kerajinan Tradisional</option>
+                        <option value="Bahasa & Sastra Lisan">Bahasa & Sastra Lisan</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block font-bold mb-1">Status Pelestarian</label>
+                      <select
+                        value={editBudayaForm.status}
+                        onChange={e => setEditBudayaForm({ ...editBudayaForm, status: e.target.value as 'aktif' | 'lestari' })}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5"
+                      >
+                        <option value="aktif">Aktif Digelar</option>
+                        <option value="lestari">Lestari Turun-temurun</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold mb-1">Lokasi / Sanggar / RT</label>
+                    <input
+                      type="text"
+                      required
+                      value={editBudayaForm.lokasi}
+                      onChange={e => setEditBudayaForm({ ...editBudayaForm, lokasi: e.target.value })}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5"
+                    />
+                  </div>
+
+                  <ImageUploader
+                    label="Foto Sampul Budaya"
+                    value={editBudayaForm.gambar}
+                    onChange={val => setEditBudayaForm({ ...editBudayaForm, gambar: val })}
+                  />
+
+                  <div>
+                    <label className="block font-bold mb-1">Deskripsi Lengkap Budaya</label>
+                    <textarea
+                      rows={3}
+                      required
+                      value={editBudayaForm.deskripsi}
+                      onChange={e => setEditBudayaForm({ ...editBudayaForm, deskripsi: e.target.value })}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                    <button
+                      type="button"
+                      onClick={() => { setEditingBudayaId(null); setEditBudayaForm(null); }}
+                      className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 font-bold hover:bg-slate-100 cursor-pointer"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-5 py-2 rounded-xl bg-amber-700 hover:bg-amber-800 text-white font-bold flex items-center gap-1.5 cursor-pointer shadow-md"
+                    >
+                      <Save className="w-4 h-4" /> Simpan Perubahan
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {/* Header Bar */}
+          <div className="bg-gradient-to-r from-amber-900 via-orange-800 to-rose-900 text-white p-6 rounded-3xl shadow-md border border-amber-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-300 flex items-center justify-center shrink-0">
+                <Landmark className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white">Kelola Warisan Budaya & Tradisi Leluhur</h3>
+                <p className="text-xs text-amber-200">Kesenian, Upacara Adat, dan Pengetahuan Lokal Dusun Tosari</p>
+              </div>
+            </div>
+            <div className="bg-amber-800/60 px-4 py-2 rounded-2xl border border-amber-700 text-center shrink-0">
+              <p className="text-xl font-black text-amber-300">{budayaList.length} Budaya Terdata</p>
+              <p className="text-[10px] text-amber-200">Tampil di Halaman Budaya</p>
+            </div>
+          </div>
+
+          {/* Form Tambah Budaya Baru */}
+          <form onSubmit={handleCreateBudaya} className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
+              <Plus className="w-5 h-5 text-amber-700" />
+              Tambah Warisan Budaya & Tradisi Baru
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block font-bold mb-1">Nama Budaya / Kesenian <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Contoh: Calung Bambu Tradisional"
+                  value={newBudayaName}
+                  onChange={e => setNewBudayaName(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold mb-1">Kategori Budaya</label>
+                <select
+                  value={newBudayaCat}
+                  onChange={e => setNewBudayaCat(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500"
+                >
+                  <option value="Kesenian">Kesenian</option>
+                  <option value="Tarian Tradisional">Tarian Tradisional</option>
+                  <option value="Upacara Adat">Upacara Adat</option>
+                  <option value="Kerajinan Tradisional">Kerajinan Tradisional</option>
+                  <option value="Bahasa & Sastra Lisan">Bahasa & Sastra Lisan</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-bold mb-1">Status Pelestarian</label>
+                <select
+                  value={newBudayaStatus}
+                  onChange={e => setNewBudayaStatus(e.target.value as 'aktif' | 'lestari')}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500"
+                >
+                  <option value="aktif">Aktif Digelar</option>
+                  <option value="lestari">Lestari Turun-temurun</option>
+                </select>
+              </div>
+
+              <div className="sm:col-span-3">
+                <label className="block font-bold mb-1">Lokasi / Sanggar / RT Terkait <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Contoh: Sanggar Seni Warga RT 02 / Dusun Tosari"
+                  value={newBudayaLokasi}
+                  onChange={e => setNewBudayaLokasi(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500"
+                />
+              </div>
+            </div>
+
+            <ImageUploader
+              label="Foto Sampul Budaya (Opsional)"
+              value={newBudayaImg}
+              onChange={setNewBudayaImg}
+              placeholder="https://images.unsplash.com/..."
+            />
+
+            <div>
+              <label className="block font-bold mb-1">Deskripsi Lengkap Budaya <span className="text-red-500">*</span></label>
+              <textarea
+                rows={3}
+                required
+                placeholder="Ceritakan sejarah, filosofi, atau cara pelaksanaan tradisi budaya ini..."
+                value={newBudayaDesc}
+                onChange={e => setNewBudayaDesc(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="bg-amber-700 hover:bg-amber-800 text-white font-bold px-6 py-2.5 rounded-xl cursor-pointer shadow-md transition-all inline-flex items-center gap-2"
+            >
+              <Landmark className="w-4 h-4" /> Tambahkan Warisan Budaya Baru
+            </button>
+          </form>
+
+          {/* Daftar Budaya Terdata */}
+          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <Landmark className="w-5 h-5 text-amber-700" />
+                Daftar Warisan Budaya & Tradisi Terdata ({budayaList.length})
+              </h3>
+            </div>
+
+            {budayaList.length === 0 ? (
+              <p className="text-slate-500 text-center py-6">Belum ada data budaya terdaftar.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {budayaList.map((item) => (
+                  <div key={item.id} className="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden flex flex-col justify-between shadow-xs">
+                    <div className="relative h-40 bg-slate-200 overflow-hidden">
+                      <img
+                        src={item.gambar}
+                        alt={item.nama}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover"
+                      />
+                      <span className="absolute top-3 left-3 bg-slate-900/80 text-amber-300 px-2.5 py-1 rounded-full text-[10px] font-bold">
+                        {item.kategori}
+                      </span>
+                      <span className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold text-white ${item.status === 'aktif' ? 'bg-emerald-600' : 'bg-blue-600'
+                        }`}>
+                        {item.status === 'aktif' ? 'Aktif' : 'Lestari'}
+                      </span>
+                    </div>
+
+                    <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
+                      <div className="space-y-1">
+                        <h4 className="font-bold text-slate-900 text-sm line-clamp-1">{item.nama}</h4>
+                        <p className="text-[11px] text-slate-500 line-clamp-2">{item.deskripsi}</p>
+                        <p className="text-[10px] text-amber-800 font-medium flex items-center gap-1 pt-1">
+                          <MapPin className="w-3 h-3 text-amber-700" /> {item.lokasi}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200">
+                        <button
+                          onClick={() => startEditBudaya(item)}
+                          className="bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-3 py-1.5 rounded-lg text-[11px] transition-colors flex items-center gap-1 cursor-pointer"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" /> Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteBudaya(item.id, item.nama)}
+                          className="bg-red-100 hover:bg-red-200 text-red-700 font-bold px-3 py-1.5 rounded-lg text-[11px] transition-colors flex items-center gap-1 cursor-pointer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" /> Hapus
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Live Preview Halaman Budaya */}
+          <div className="bg-slate-900 text-white p-6 sm:p-8 rounded-3xl space-y-6 border border-slate-800 shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center text-white">
+                  <Landmark className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold">Live Preview: Tampilan Halaman Budaya</h3>
+                  <p className="text-xs text-amber-300">Warisan Budaya & Tradisi Dusun Tosari</p>
+                </div>
+              </div>
+              <span className="text-[11px] bg-amber-950 text-amber-300 px-3 py-1 rounded-full font-semibold">
+                Pratinjau Publik
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {budayaList.map((item) => (
+                <div key={item.id} className="bg-slate-800/80 p-4 rounded-2xl border border-slate-700 space-y-2">
+                  <span className="inline-block bg-amber-600 text-white font-bold text-[10px] px-2 py-0.5 rounded-md">
+                    {item.kategori}
+                  </span>
+                  <h4 className="font-bold text-white text-sm">{item.nama}</h4>
+                  <p className="text-[11px] text-slate-300 line-clamp-2">{item.deskripsi}</p>
+                  <p className="text-[10px] text-amber-400 font-medium flex items-center gap-1 pt-1">
+                    <MapPin className="w-3 h-3 text-amber-400" /> {item.lokasi}
+                  </p>
                 </div>
               ))}
             </div>
