@@ -16,6 +16,7 @@ import { BottomNav } from './components/BottomNav';
 import { UmkmDetailModal } from './components/modals/UmkmDetailModal';
 import { WisataDetailModal } from './components/modals/WisataDetailModal';
 import { BeritaDetailModal } from './components/modals/BeritaDetailModal';
+import { BudayaDetailModal } from './components/modals/BudayaDetailModal';
 import { UmkmRegisterModal } from './components/modals/UmkmRegisterModal';
 
 const MainContent: React.FC = () => {
@@ -51,6 +52,7 @@ const MainContent: React.FC = () => {
       <UmkmDetailModal />
       <WisataDetailModal />
       <BeritaDetailModal />
+      <BudayaDetailModal />
       <UmkmRegisterModal />
     </div>
   );

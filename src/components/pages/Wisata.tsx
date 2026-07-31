@@ -8,7 +8,6 @@ import {
   GraduationCap,
   UtensilsCrossed,
   Search,
-  Star,
   MapPin,
   Clock,
   Ticket,
@@ -124,9 +123,6 @@ export const Wisata: React.FC = () => {
                 <Heart className={`w-3.5 h-3.5 ${w.favorit ? 'text-red-500 fill-red-500' : 'text-slate-600'}`} />
               </button>
 
-              <div className="absolute bottom-3 left-3 bg-slate-900/80 text-amber-300 font-bold text-[11px] px-2 py-0.5 rounded-full flex items-center gap-1 backdrop-blur-xs">
-                <Star className="w-3 h-3 fill-amber-300" /> {w.rating}
-              </div>
             </div>
 
             {/* Card Content */}

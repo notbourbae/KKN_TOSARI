@@ -126,6 +126,8 @@ interface DusunContextType {
   setSelectedWisataModal: (item: WisataItem | null) => void;
   selectedBeritaModal: BeritaItem | null;
   setSelectedBeritaModal: (item: BeritaItem | null) => void;
+  selectedBudayaModal: BudayaItem | null;
+  setSelectedBudayaModal: (item: BudayaItem | null) => void;
   showUmkmRegisterModal: boolean;
   setShowUmkmRegisterModal: (show: boolean) => void;
 
@@ -171,6 +173,7 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [selectedUmkmModal, setSelectedUmkmModal] = useState<UmkmItem | null>(null);
   const [selectedWisataModal, setSelectedWisataModal] = useState<WisataItem | null>(null);
   const [selectedBeritaModal, setSelectedBeritaModal] = useState<BeritaItem | null>(null);
+  const [selectedBudayaModal, setSelectedBudayaModal] = useState<BudayaItem | null>(null);
   const [showUmkmRegisterModal, setShowUmkmRegisterModal] = useState(false);
   const [adminNotification, setAdminNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
@@ -539,6 +542,8 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setSelectedWisataModal,
         selectedBeritaModal,
         setSelectedBeritaModal,
+        selectedBudayaModal,
+        setSelectedBudayaModal,
         showUmkmRegisterModal,
         setShowUmkmRegisterModal,
         loading,

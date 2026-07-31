@@ -6,7 +6,6 @@ import {
   Search,
   PlusCircle,
   Phone,
-  Star,
   MapPin,
   Tag,
   Utensils,
@@ -125,9 +124,6 @@ export const Umkm: React.FC = () => {
                 />
                 <span className="absolute top-3 left-3 bg-emerald-700 text-white font-semibold text-[10px] px-2.5 py-0.5 rounded-full shadow-xs">
                   {u.kategori}
-                </span>
-                <span className="absolute top-3 right-3 bg-slate-900/80 text-amber-300 font-bold text-[11px] px-2 py-0.5 rounded-full flex items-center gap-1 backdrop-blur-xs">
-                  <Star className="w-3 h-3 fill-amber-300" /> {u.rating}
                 </span>
               </div>
 

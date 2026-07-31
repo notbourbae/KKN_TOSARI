@@ -20,7 +20,7 @@ const categoryMeta: Record<string, { icon: React.ReactNode; color: string }> = {
 };
 
 export const Budaya: React.FC = () => {
-  const { budayaList } = useDusun();
+  const { budayaList, setSelectedBudayaModal } = useDusun();
 
   const [selectedCategory, setSelectedCategory] = useState<string>('Semua');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -81,11 +81,10 @@ export const Budaya: React.FC = () => {
             <button
               key={cat.name}
               onClick={() => setSelectedCategory(cat.name)}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-                selectedCategory === cat.name
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${selectedCategory === cat.name
                   ? 'bg-slate-900 text-white shadow-md'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-              }`}
+                }`}
             >
               {cat.icon}
               {cat.name}
@@ -130,6 +129,7 @@ export const Budaya: React.FC = () => {
               return (
                 <div
                   key={item.id}
+                  onClick={() => setSelectedBudayaModal(item)}
                   className="group bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs hover:shadow-lg hover:border-amber-300 transition-all cursor-pointer flex flex-col"
                 >
                   <div className="relative h-48 bg-slate-100 overflow-hidden shrink-0">
@@ -144,9 +144,8 @@ export const Budaya: React.FC = () => {
                       {meta.icon}
                       {item.kategori}
                     </span>
-                    <span className={`absolute top-3 right-3 text-[10px] font-bold px-2.5 py-1 rounded-full ${
-                      item.status === 'aktif' ? 'bg-emerald-600 text-white' : 'bg-blue-700 text-white'
-                    }`}>
+                    <span className={`absolute top-3 right-3 text-[10px] font-bold px-2.5 py-1 rounded-full ${item.status === 'aktif' ? 'bg-emerald-600 text-white' : 'bg-blue-700 text-white'
+                      }`}>
                       {item.status === 'aktif' ? 'Aktif' : 'Lestari'}
                     </span>
                   </div>

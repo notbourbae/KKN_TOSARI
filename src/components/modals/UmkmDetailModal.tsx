@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDusun } from '../../context/DusunContext';
-import { X, Phone, MapPin, Store, User, Star, ExternalLink, ShoppingBag, CheckCircle } from 'lucide-react';
+import { X, Phone, MapPin, Store, User, ExternalLink, ShoppingBag, CheckCircle } from 'lucide-react';
 
 export const UmkmDetailModal: React.FC = () => {
   const { selectedUmkmModal, setSelectedUmkmModal } = useDusun();
@@ -14,7 +14,7 @@ export const UmkmDetailModal: React.FC = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-200">
       <div className="relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-100 max-h-[90vh] flex flex-col my-auto">
-        
+
         {/* Modal Header */}
         <div className="relative h-48 sm:h-64 bg-slate-800 shrink-0">
           <img
@@ -24,7 +24,7 @@ export const UmkmDetailModal: React.FC = () => {
             className="w-full h-full object-cover opacity-85"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent"></div>
-          
+
           <button
             onClick={() => setSelectedUmkmModal(null)}
             className="absolute top-4 right-4 bg-white/80 hover:bg-white text-slate-800 p-2 rounded-full shadow-md transition-all cursor-pointer z-10"
@@ -43,17 +43,13 @@ export const UmkmDetailModal: React.FC = () => {
               <span className="flex items-center gap-1 font-medium">
                 <User className="w-3.5 h-3.5" /> Pemilik: {umkm.pemilik}
               </span>
-              <span>•</span>
-              <span className="flex items-center gap-1 text-amber-300 font-bold">
-                <Star className="w-3.5 h-3.5 fill-amber-300" /> {umkm.rating}
-              </span>
             </div>
           </div>
         </div>
 
         {/* Modal Content Scrollable */}
         <div className="p-6 overflow-y-auto space-y-6 text-slate-700 text-sm">
-          
+
           {/* Business Info Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
             <div>

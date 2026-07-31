@@ -47,10 +47,13 @@ export const Admin: React.FC = () => {
     deletePejabat,
     beritaList,
     addBerita,
+    updateBerita,
     deleteBerita,
     umkmList,
+    addUmkmRegistration,
     approveUmkm,
     rejectUmkm,
+    updateUmkm,
     deleteUmkm,
     wisataList,
     addWisata,
@@ -62,6 +65,7 @@ export const Admin: React.FC = () => {
     deleteWisataEvent,
     potensiSDA,
     addPotensiSDA,
+    updatePotensiSDA,
     deletePotensiSDA,
     budayaList,
     addBudaya,
@@ -154,6 +158,7 @@ export const Admin: React.FC = () => {
   const [newWisataTicket, setNewWisataTicket] = useState('Rp 10.000 / Orang');
   const [newWisataImg, setNewWisataImg] = useState('');
   const [newWisataMap, setNewWisataMap] = useState('');
+  const [newWisataFasilitas, setNewWisataFasilitas] = useState('Area Parkir, Toilet, Musholla, Spot Foto, Warung Makan');
 
   const [editingWisataId, setEditingWisataId] = useState<string | null>(null);
   const [editWisataForm, setEditWisataForm] = useState<WisataItem | null>(null);
@@ -175,6 +180,57 @@ export const Admin: React.FC = () => {
   const [newSdaLuas, setNewSdaLuas] = useState('');
   const [newSdaHasil, setNewSdaHasil] = useState('');
   const [newSdaImg, setNewSdaImg] = useState('');
+
+  // Edit Berita State & Handlers
+  const [editingBeritaId, setEditingBeritaId] = useState<string | null>(null);
+  const [editBeritaForm, setEditBeritaForm] = useState<BeritaItem | null>(null);
+
+  const startEditBerita = (item: BeritaItem) => {
+    setEditingBeritaId(item.id);
+    setEditBeritaForm({ ...item });
+  };
+  const handleSaveEditBerita = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingBeritaId || !editBeritaForm) return;
+    updateBerita(editingBeritaId, editBeritaForm);
+    setEditingBeritaId(null);
+    setEditBeritaForm(null);
+    alert('Berita berhasil diperbarui!');
+  };
+
+  // Edit UMKM State & Handlers
+  const [editingUmkmId, setEditingUmkmId] = useState<string | null>(null);
+  const [editUmkmForm, setEditUmkmForm] = useState<UmkmItem | null>(null);
+
+  const startEditUmkm = (item: UmkmItem) => {
+    setEditingUmkmId(item.id);
+    setEditUmkmForm({ ...item });
+  };
+  const handleSaveEditUmkm = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingUmkmId || !editUmkmForm) return;
+    updateUmkm(editingUmkmId, editUmkmForm);
+    setEditingUmkmId(null);
+    setEditUmkmForm(null);
+    alert('Data UMKM berhasil diperbarui!');
+  };
+
+  // Edit SDA State & Handlers
+  const [editingSdaId, setEditingSdaId] = useState<string | null>(null);
+  const [editSdaForm, setEditSdaForm] = useState<PotensiSDA | null>(null);
+
+  const startEditSda = (item: PotensiSDA) => {
+    setEditingSdaId(item.id);
+    setEditSdaForm({ ...item });
+  };
+  const handleSaveEditSda = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingSdaId || !editSdaForm) return;
+    updatePotensiSDA(editingSdaId, editSdaForm);
+    setEditingSdaId(null);
+    setEditSdaForm(null);
+    alert('Potensi SDA berhasil diperbarui!');
+  };
 
   const pendingUmkm = umkmList.filter(u => u.status === 'menunggu');
 
@@ -256,7 +312,7 @@ export const Admin: React.FC = () => {
       googleMapsPin: newWisataMap || 'https://maps.google.com',
       jamOperasional: newWisataHours,
       hargaTiket: newWisataTicket,
-      fasilitas: ['Area Parkir', 'Toilet', 'Musholla'],
+      fasilitas: newWisataFasilitas ? newWisataFasilitas.split(',').map(s => s.trim()).filter(Boolean) : ['Area Parkir', 'Toilet', 'Musholla'],
       kontakPengelola: dusunInfo.teleponDusun
     });
 
@@ -264,6 +320,7 @@ export const Admin: React.FC = () => {
     setNewWisataDesc('');
     setNewWisataImg('');
     setNewWisataMap('');
+    setNewWisataFasilitas('Area Parkir, Toilet, Musholla, Spot Foto, Warung Makan');
     alert('Destinasi wisata baru berhasil ditambahkan!');
   };
 
@@ -1228,23 +1285,61 @@ export const Admin: React.FC = () => {
             </button>
           </form>
 
-          {/* List Berita with Delete */}
+          {/* List Berita with Edit & Delete */}
           <div className="bg-white p-6 rounded-3xl border border-slate-200 space-y-4">
             <h3 className="text-base font-bold text-slate-900">Daftar Berita & Pengumuman Active</h3>
             <div className="space-y-3">
               {beritaList.map(b => (
-                <div key={b.id} className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between gap-4 text-xs">
-                  <div>
-                    <span className="font-bold text-emerald-800">[{b.kategori}]</span>{' '}
-                    <span className="font-bold text-slate-900">{b.judul}</span>
-                    <p className="text-slate-500 text-[11px]">{b.tanggal} • Dibaca {b.dibaca} kali</p>
-                  </div>
-                  <button
-                    onClick={() => deleteBerita(b.id)}
-                    className="text-red-600 hover:text-red-800 p-1 font-bold text-xs cursor-pointer flex items-center gap-1"
-                  >
-                    <Trash2 className="w-4 h-4" /> Hapus
-                  </button>
+                <div key={b.id}>
+                  {editingBeritaId === b.id && editBeritaForm ? (
+                    <form onSubmit={handleSaveEditBerita} className="p-4 bg-emerald-50 rounded-xl border border-emerald-200 space-y-3">
+                      <h4 className="font-bold text-slate-900">Edit Berita</h4>
+                      <div>
+                        <label className="block font-bold mb-1">Judul Artikel</label>
+                        <input type="text" required value={editBeritaForm.judul} onChange={e => setEditBeritaForm({ ...editBeritaForm, judul: e.target.value })} className="w-full bg-white border border-slate-200 rounded-lg p-2" />
+                      </div>
+                      <div>
+                        <label className="block font-bold mb-1">Kategori</label>
+                        <select value={editBeritaForm.kategori} onChange={e => setEditBeritaForm({ ...editBeritaForm, kategori: e.target.value as any })} className="w-full bg-white border border-slate-200 rounded-lg p-2">
+                          <option value="Berita">Berita</option>
+                          <option value="Pengumuman">Pengumuman</option>
+                          <option value="Agenda">Agenda</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block font-bold mb-1">Ringkasan Singkat</label>
+                        <input type="text" required value={editBeritaForm.ringkasan} onChange={e => setEditBeritaForm({ ...editBeritaForm, ringkasan: e.target.value })} className="w-full bg-white border border-slate-200 rounded-lg p-2" />
+                      </div>
+                      <div>
+                        <label className="block font-bold mb-1">Isi Berita</label>
+                        <textarea rows={3} value={editBeritaForm.konten} onChange={e => setEditBeritaForm({ ...editBeritaForm, konten: e.target.value })} className="w-full bg-white border border-slate-200 rounded-lg p-2" />
+                      </div>
+                      <ImageUploader label="Gambar Utama" value={editBeritaForm.gambar} onChange={val => setEditBeritaForm({ ...editBeritaForm, gambar: val })} />
+                      <div className="flex items-center gap-2">
+                        <button type="submit" className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-4 py-1.5 rounded-lg flex items-center gap-1 cursor-pointer"><Save className="w-3.5 h-3.5" /> Simpan</button>
+                        <button type="button" onClick={() => { setEditingBeritaId(null); setEditBeritaForm(null); }} className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-1.5 rounded-lg cursor-pointer">Batal</button>
+                      </div>
+                    </form>
+                  ) : (
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between gap-4 text-xs">
+                      <div>
+                        <span className="font-bold text-emerald-800">[{b.kategori}]</span>{' '}
+                        <span className="font-bold text-slate-900">{b.judul}</span>
+                        <p className="text-slate-500 text-[11px]">{b.tanggal} • Dibaca {b.dibaca} kali</p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button onClick={() => startEditBerita(b)} className="text-emerald-700 hover:text-emerald-900 font-bold p-1 cursor-pointer flex items-center gap-1">
+                          <Edit3 className="w-4 h-4" /> Edit
+                        </button>
+                        <button
+                          onClick={() => deleteBerita(b.id)}
+                          className="text-red-600 hover:text-red-800 p-1 font-bold text-xs cursor-pointer flex items-center gap-1"
+                        >
+                          <Trash2 className="w-4 h-4" /> Hapus
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -1258,35 +1353,77 @@ export const Admin: React.FC = () => {
           <h3 className="text-base font-bold text-slate-900">Daftar Seluruh UMKM ({umkmList.length})</h3>
           <div className="space-y-3">
             {umkmList.map(u => (
-              <div key={u.id} className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-bold text-slate-900 text-sm">{u.namaUsaha}</h4>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${u.status === 'disetujui' ? 'bg-emerald-100 text-emerald-800' :
-                      u.status === 'menunggu' ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                      {u.status.toUpperCase()}
-                    </span>
-                  </div>
-                  <p className="text-slate-600">Pemilik: {u.pemilik} | WA: {u.whatsapp} | Kategori: {u.kategori}</p>
-                </div>
+              <div key={u.id}>
+                {editingUmkmId === u.id && editUmkmForm ? (
+                  <form onSubmit={handleSaveEditUmkm} className="p-4 bg-amber-50 rounded-xl border border-amber-200 space-y-3">
+                    <h4 className="font-bold text-slate-900">Edit UMKM: {editUmkmForm.namaUsaha}</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block font-bold mb-1">Nama Usaha</label>
+                        <input type="text" required value={editUmkmForm.namaUsaha} onChange={e => setEditUmkmForm({ ...editUmkmForm, namaUsaha: e.target.value })} className="w-full bg-white border border-slate-200 rounded-lg p-2" />
+                      </div>
+                      <div>
+                        <label className="block font-bold mb-1">Pemilik</label>
+                        <input type="text" required value={editUmkmForm.pemilik} onChange={e => setEditUmkmForm({ ...editUmkmForm, pemilik: e.target.value })} className="w-full bg-white border border-slate-200 rounded-lg p-2" />
+                      </div>
+                      <div>
+                        <label className="block font-bold mb-1">Kategori</label>
+                        <input type="text" value={editUmkmForm.kategori} onChange={e => setEditUmkmForm({ ...editUmkmForm, kategori: e.target.value })} className="w-full bg-white border border-slate-200 rounded-lg p-2" />
+                      </div>
+                      <div>
+                        <label className="block font-bold mb-1">WhatsApp</label>
+                        <input type="text" value={editUmkmForm.whatsapp} onChange={e => setEditUmkmForm({ ...editUmkmForm, whatsapp: e.target.value })} className="w-full bg-white border border-slate-200 rounded-lg p-2" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block font-bold mb-1">Alamat</label>
+                      <input type="text" value={editUmkmForm.alamat} onChange={e => setEditUmkmForm({ ...editUmkmForm, alamat: e.target.value })} className="w-full bg-white border border-slate-200 rounded-lg p-2" />
+                    </div>
+                    <div>
+                      <label className="block font-bold mb-1">Deskripsi</label>
+                      <textarea rows={2} value={editUmkmForm.deskripsi} onChange={e => setEditUmkmForm({ ...editUmkmForm, deskripsi: e.target.value })} className="w-full bg-white border border-slate-200 rounded-lg p-2" />
+                    </div>
+                    <ImageUploader label="Foto Usaha" value={editUmkmForm.gambar} onChange={val => setEditUmkmForm({ ...editUmkmForm, gambar: val })} />
+                    <div className="flex items-center gap-2">
+                      <button type="submit" className="bg-amber-700 hover:bg-amber-800 text-white font-bold px-4 py-1.5 rounded-lg flex items-center gap-1 cursor-pointer"><Save className="w-3.5 h-3.5" /> Simpan</button>
+                      <button type="button" onClick={() => { setEditingUmkmId(null); setEditUmkmForm(null); }} className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-1.5 rounded-lg cursor-pointer">Batal</button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-bold text-slate-900 text-sm">{u.namaUsaha}</h4>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${u.status === 'disetujui' ? 'bg-emerald-100 text-emerald-800' :
+                          u.status === 'menunggu' ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800'
+                          }`}>
+                          {u.status.toUpperCase()}
+                        </span>
+                      </div>
+                      <p className="text-slate-600">Pemilik: {u.pemilik} | WA: {u.whatsapp} | Kategori: {u.kategori}</p>
+                    </div>
 
-                <div className="flex items-center gap-2">
-                  {u.status === 'menunggu' && (
-                    <button
-                      onClick={() => approveUmkm(u.id)}
-                      className="bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs"
-                    >
-                      Setujui
-                    </button>
-                  )}
-                  <button
-                    onClick={() => deleteUmkm(u.id)}
-                    className="text-red-600 hover:text-red-800 font-bold p-1 cursor-pointer flex items-center gap-1"
-                  >
-                    <Trash2 className="w-4 h-4" /> Hapus
-                  </button>
-                </div>
+                    <div className="flex items-center gap-2">
+                      {u.status === 'menunggu' && (
+                        <button
+                          onClick={() => approveUmkm(u.id)}
+                          className="bg-emerald-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs"
+                        >
+                          Setujui
+                        </button>
+                      )}
+                      <button onClick={() => startEditUmkm(u)} className="text-amber-700 hover:text-amber-900 font-bold p-1 cursor-pointer flex items-center gap-1">
+                        <Edit3 className="w-4 h-4" /> Edit
+                      </button>
+                      <button
+                        onClick={() => deleteUmkm(u.id)}
+                        className="text-red-600 hover:text-red-800 font-bold p-1 cursor-pointer flex items-center gap-1"
+                      >
+                        <Trash2 className="w-4 h-4" /> Hapus
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -1373,6 +1510,18 @@ export const Admin: React.FC = () => {
               />
             </div>
 
+            <div>
+              <label className="block font-bold mb-1">Fasilitas Wisata (Pisahkan dengan koma)</label>
+              <input
+                type="text"
+                placeholder="Contoh: Area Parkir, Toilet, Musholla, Spot Foto, Warung Makan"
+                value={newWisataFasilitas}
+                onChange={e => setNewWisataFasilitas(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2"
+              />
+              <p className="text-[11px] text-slate-500 mt-1">Contoh: Area Parkir, Toilet, Musholla, Spot Foto, Gazebo</p>
+            </div>
+
             <ImageUploader
               label="Foto / Gambar Destinasi Wisata"
               value={newWisataImg}
@@ -1454,6 +1603,16 @@ export const Admin: React.FC = () => {
                         value={editWisataForm.deskripsi}
                         onChange={e => setEditWisataForm({ ...editWisataForm, deskripsi: e.target.value })}
                         className="w-full bg-white border border-slate-200 rounded-lg p-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold mb-1">Fasilitas Wisata (Pisahkan dengan koma)</label>
+                      <input
+                        type="text"
+                        value={editWisataForm.fasilitas ? editWisataForm.fasilitas.join(', ') : ''}
+                        onChange={e => setEditWisataForm({ ...editWisataForm, fasilitas: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
+                        className="w-full bg-white border border-slate-200 rounded-lg p-2"
+                        placeholder="Contoh: Area Parkir, Toilet, Musholla, Spot Foto"
                       />
                     </div>
                     <ImageUploader
@@ -1593,17 +1752,62 @@ export const Admin: React.FC = () => {
           <div className="bg-white p-6 rounded-3xl border border-slate-200 space-y-3">
             <h3 className="text-base font-bold text-slate-900">Daftar Potensi SDA Terdata ({potensiSDA.length})</h3>
             {potensiSDA.map(sda => (
-              <div key={sda.id} className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between gap-4">
-                <div>
-                  <h4 className="font-bold text-slate-900">{sda.nama}</h4>
-                  <p className="text-slate-500 text-[11px]">{sda.kategori} • {sda.luasAtauJumlah} • {sda.estimasiHasil}</p>
-                </div>
-                <button
-                  onClick={() => deletePotensiSDA(sda.id)}
-                  className="text-red-600 hover:text-red-800 font-bold p-1 cursor-pointer flex items-center gap-1"
-                >
-                  <Trash2 className="w-4 h-4" /> Hapus
-                </button>
+              <div key={sda.id}>
+                {editingSdaId === sda.id && editSdaForm ? (
+                  <form onSubmit={handleSaveEditSda} className="p-4 bg-emerald-50 rounded-xl border border-emerald-200 space-y-3">
+                    <h4 className="font-bold text-slate-900">Edit Potensi SDA: {editSdaForm.nama}</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block font-bold mb-1">Nama Sektor / Potensi</label>
+                        <input type="text" required value={editSdaForm.nama} onChange={e => setEditSdaForm({ ...editSdaForm, nama: e.target.value })} className="w-full bg-white border border-slate-200 rounded-lg p-2" />
+                      </div>
+                      <div>
+                        <label className="block font-bold mb-1">Kategori</label>
+                        <select value={editSdaForm.kategori} onChange={e => setEditSdaForm({ ...editSdaForm, kategori: e.target.value as any })} className="w-full bg-white border border-slate-200 rounded-lg p-2">
+                          <option value="Pertanian">Pertanian</option>
+                          <option value="Perkebunan">Perkebunan</option>
+                          <option value="Peternakan">Peternakan</option>
+                          <option value="Perikanan">Perikanan</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block font-bold mb-1">Luas Lahan / Jumlah</label>
+                        <input type="text" value={editSdaForm.luasAtauJumlah} onChange={e => setEditSdaForm({ ...editSdaForm, luasAtauJumlah: e.target.value })} className="w-full bg-white border border-slate-200 rounded-lg p-2" />
+                      </div>
+                      <div>
+                        <label className="block font-bold mb-1">Estimasi Hasil</label>
+                        <input type="text" value={editSdaForm.estimasiHasil} onChange={e => setEditSdaForm({ ...editSdaForm, estimasiHasil: e.target.value })} className="w-full bg-white border border-slate-200 rounded-lg p-2" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block font-bold mb-1">Deskripsi</label>
+                      <textarea rows={2} value={editSdaForm.deskripsi} onChange={e => setEditSdaForm({ ...editSdaForm, deskripsi: e.target.value })} className="w-full bg-white border border-slate-200 rounded-lg p-2" />
+                    </div>
+                    <ImageUploader label="Foto Sampul" value={editSdaForm.gambar} onChange={val => setEditSdaForm({ ...editSdaForm, gambar: val })} />
+                    <div className="flex items-center gap-2">
+                      <button type="submit" className="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-4 py-1.5 rounded-lg flex items-center gap-1 cursor-pointer"><Save className="w-3.5 h-3.5" /> Simpan</button>
+                      <button type="button" onClick={() => { setEditingSdaId(null); setEditSdaForm(null); }} className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-1.5 rounded-lg cursor-pointer">Batal</button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between gap-4">
+                    <div>
+                      <h4 className="font-bold text-slate-900">{sda.nama}</h4>
+                      <p className="text-slate-500 text-[11px]">{sda.kategori} • {sda.luasAtauJumlah} • {sda.estimasiHasil}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => startEditSda(sda)} className="text-emerald-700 hover:text-emerald-900 font-bold p-1 cursor-pointer flex items-center gap-1">
+                        <Edit3 className="w-4 h-4" /> Edit
+                      </button>
+                      <button
+                        onClick={() => deletePotensiSDA(sda.id)}
+                        className="text-red-600 hover:text-red-800 font-bold p-1 cursor-pointer flex items-center gap-1"
+                      >
+                        <Trash2 className="w-4 h-4" /> Hapus
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>

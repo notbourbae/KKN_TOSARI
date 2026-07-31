@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDusun } from '../context/DusunContext';
-import { Building2, MapPin, Phone, Mail, Heart, ShieldCheck } from 'lucide-react';
+import { Building2, MapPin, Phone, Mail, ShieldCheck } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   const { dusunInfo, setActiveTab, setActiveInfoSubTab } = useDusun();
@@ -9,7 +9,7 @@ export const Footer: React.FC = () => {
     <footer id="site-footer" className="bg-slate-900 text-slate-300 pt-12 pb-8 border-t border-slate-800 mt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 pb-10 border-b border-slate-800">
-          
+
           {/* Col 1: Brand & Description */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
@@ -149,11 +149,6 @@ export const Footer: React.FC = () => {
         {/* Bottom Copyright */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>© {new Date().getFullYear()} {dusunInfo.namaDusun}, {dusunInfo.desa}. Hak Cipta Dilindungi Undang-Undang.</p>
-          <div className="flex items-center gap-1 text-slate-400">
-            <span>Dikembangkan dengan</span>
-            <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" />
-            <span>untuk Kemajuan Masyarakat Desa Indonesia</span>
-          </div>
         </div>
       </div>
     </footer>

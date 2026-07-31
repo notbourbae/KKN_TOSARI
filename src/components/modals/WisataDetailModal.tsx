@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDusun } from '../../context/DusunContext';
-import { X, MapPin, Clock, Ticket, Phone, Star, ExternalLink, Compass, CheckCircle2, Heart } from 'lucide-react';
+import { X, MapPin, Clock, Ticket, Phone, ExternalLink, Compass, CheckCircle2, Heart } from 'lucide-react';
 
 export const WisataDetailModal: React.FC = () => {
   const { selectedWisataModal, setSelectedWisataModal, toggleFavoriteWisata } = useDusun();
@@ -49,9 +49,6 @@ export const WisataDetailModal: React.FC = () => {
             <h2 className="text-xl sm:text-3xl font-extrabold text-white tracking-tight drop-shadow-sm">
               {wisata.nama}
             </h2>
-            <div className="flex items-center gap-2 text-amber-300 font-bold text-xs mt-1">
-              <Star className="w-4 h-4 fill-amber-300" /> {wisata.rating} / 5.0 (Ulasan Pengunjung)
-            </div>
           </div>
         </div>
 

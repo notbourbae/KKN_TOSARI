@@ -7,7 +7,6 @@ import {
   Compass,
   ArrowRight,
   Newspaper,
-  Star,
   Phone,
   Trees,
   Quote,
@@ -286,9 +285,6 @@ export const Home: React.FC = () => {
                 <span className="absolute top-3 left-3 bg-emerald-700 text-white font-semibold text-[10px] px-2.5 py-0.5 rounded-full">
                   {u.kategori}
                 </span>
-                <span className="absolute top-3 right-3 bg-slate-900/80 text-amber-300 font-bold text-[11px] px-2 py-0.5 rounded-full flex items-center gap-1 backdrop-blur-xs">
-                  <Star className="w-3 h-3 fill-amber-300" /> {u.rating}
-                </span>
               </div>
               <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                 <div className="space-y-2">
@@ -341,9 +337,6 @@ export const Home: React.FC = () => {
                 />
                 <span className="absolute top-3 left-3 bg-teal-700 text-white font-semibold text-[10px] px-2.5 py-0.5 rounded-full">
                   {w.kategori}
-                </span>
-                <span className="absolute top-3 right-3 bg-slate-900/80 text-amber-300 font-bold text-[11px] px-2 py-0.5 rounded-full flex items-center gap-1">
-                  <Star className="w-3 h-3 fill-amber-300" /> {w.rating}
                 </span>
               </div>
               <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
