@@ -54,6 +54,7 @@ export const Admin: React.FC = () => {
     deleteUmkm,
     wisataList,
     addWisata,
+    updateWisata,
     deleteWisata,
     wisataEvents,
     addWisataEvent,
@@ -153,6 +154,9 @@ export const Admin: React.FC = () => {
   const [newWisataTicket, setNewWisataTicket] = useState('Rp 10.000 / Orang');
   const [newWisataImg, setNewWisataImg] = useState('');
   const [newWisataMap, setNewWisataMap] = useState('');
+
+  const [editingWisataId, setEditingWisataId] = useState<string | null>(null);
+  const [editWisataForm, setEditWisataForm] = useState<WisataItem | null>(null);
 
   // New Agenda / Event Form State
   const [newEvJudul, setNewEvJudul] = useState('');
@@ -261,6 +265,26 @@ export const Admin: React.FC = () => {
     setNewWisataImg('');
     setNewWisataMap('');
     alert('Destinasi wisata baru berhasil ditambahkan!');
+  };
+
+  const startEditWisata = (w: WisataItem) => {
+    setEditingWisataId(w.id);
+    setEditWisataForm({ ...w });
+  };
+
+  const handleSaveEditWisata = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingWisataId || !editWisataForm) return;
+
+    updateWisata(editingWisataId, editWisataForm);
+    setEditingWisataId(null);
+    setEditWisataForm(null);
+    alert('Destinasi wisata berhasil diperbarui!');
+  };
+
+  const handleCancelEditWisata = () => {
+    setEditingWisataId(null);
+    setEditWisataForm(null);
   };
 
   const handleCreateWisataEvent = (e: React.FormEvent) => {
@@ -1315,6 +1339,29 @@ export const Admin: React.FC = () => {
               </div>
             </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block font-bold mb-1">Jam Operasional</label>
+                <input
+                  type="text"
+                  placeholder="Contoh: 08:00 - 17:00 WIB"
+                  value={newWisataHours}
+                  onChange={e => setNewWisataHours(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2"
+                />
+              </div>
+              <div>
+                <label className="block font-bold mb-1">Harga Tiket Masuk</label>
+                <input
+                  type="text"
+                  placeholder="Contoh: Rp 10.000 / Orang"
+                  value={newWisataTicket}
+                  onChange={e => setNewWisataTicket(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2"
+                />
+              </div>
+            </div>
+
             <div>
               <label className="block font-bold mb-1">Deskripsi Destinasi</label>
               <textarea
@@ -1344,17 +1391,115 @@ export const Admin: React.FC = () => {
           <div className="bg-white p-6 rounded-3xl border border-slate-200 space-y-3">
             <h3 className="text-base font-bold text-slate-900">Daftar Tempat Wisata Active</h3>
             {wisataList.map(w => (
-              <div key={w.id} className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between gap-4">
-                <div>
-                  <h4 className="font-bold text-slate-900">{w.nama}</h4>
-                  <p className="text-slate-500 text-[11px]">{w.kategori} • Tiket: {w.hargaTiket}</p>
-                </div>
-                <button
-                  onClick={() => deleteWisata(w.id)}
-                  className="text-red-600 hover:text-red-800 font-bold p-1 cursor-pointer flex items-center gap-1"
-                >
-                  <Trash2 className="w-4 h-4" /> Hapus
-                </button>
+              <div key={w.id}>
+                {editingWisataId === w.id && editWisataForm ? (
+                  <form onSubmit={handleSaveEditWisata} className="p-4 bg-teal-50 rounded-xl border border-teal-200 space-y-3">
+                    <h4 className="font-bold text-slate-900">Edit Destinasi: {editWisataForm.nama}</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block font-bold mb-1">Nama Destinasi</label>
+                        <input
+                          type="text"
+                          required
+                          value={editWisataForm.nama}
+                          onChange={e => setEditWisataForm({ ...editWisataForm, nama: e.target.value })}
+                          className="w-full bg-white border border-slate-200 rounded-lg p-2"
+                        />
+                      </div>
+                      <div>
+                        <label className="block font-bold mb-1">Kategori</label>
+                        <select
+                          value={editWisataForm.kategori}
+                          onChange={e => setEditWisataForm({ ...editWisataForm, kategori: e.target.value as any })}
+                          className="w-full bg-white border border-slate-200 rounded-lg p-2"
+                        >
+                          <option value="Wisata Alam">Wisata Alam</option>
+                          <option value="Wisata Edukasi">Wisata Edukasi</option>
+                          <option value="Wisata Kuliner">Wisata Kuliner</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block font-bold mb-1">Jam Operasional</label>
+                        <input
+                          type="text"
+                          value={editWisataForm.jamOperasional}
+                          onChange={e => setEditWisataForm({ ...editWisataForm, jamOperasional: e.target.value })}
+                          className="w-full bg-white border border-slate-200 rounded-lg p-2"
+                        />
+                      </div>
+                      <div>
+                        <label className="block font-bold mb-1">Harga Tiket Masuk</label>
+                        <input
+                          type="text"
+                          placeholder="Contoh: Rp 10.000 / Orang"
+                          value={editWisataForm.hargaTiket}
+                          onChange={e => setEditWisataForm({ ...editWisataForm, hargaTiket: e.target.value })}
+                          className="w-full bg-white border border-slate-200 rounded-lg p-2"
+                        />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label className="block font-bold mb-1">Link / Pin Google Maps</label>
+                        <input
+                          type="url"
+                          value={editWisataForm.googleMapsPin}
+                          onChange={e => setEditWisataForm({ ...editWisataForm, googleMapsPin: e.target.value })}
+                          className="w-full bg-white border border-slate-200 rounded-lg p-2"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block font-bold mb-1">Deskripsi Destinasi</label>
+                      <textarea
+                        rows={2}
+                        value={editWisataForm.deskripsi}
+                        onChange={e => setEditWisataForm({ ...editWisataForm, deskripsi: e.target.value })}
+                        className="w-full bg-white border border-slate-200 rounded-lg p-2"
+                      />
+                    </div>
+                    <ImageUploader
+                      label="Foto / Gambar Destinasi Wisata"
+                      value={editWisataForm.gambar}
+                      onChange={val => setEditWisataForm({ ...editWisataForm, gambar: val })}
+                      placeholder="https://images.unsplash.com/..."
+                    />
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="submit"
+                        className="bg-teal-700 hover:bg-teal-800 text-white font-bold px-4 py-2 rounded-xl cursor-pointer flex items-center gap-1"
+                      >
+                        <Save className="w-3.5 h-3.5" /> Simpan Perubahan
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleCancelEditWisata}
+                        className="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2 rounded-xl cursor-pointer"
+                      >
+                        Batal
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between gap-4">
+                    <div>
+                      <h4 className="font-bold text-slate-900">{w.nama}</h4>
+                      <p className="text-slate-500 text-[11px]">{w.kategori} • Jam: {w.jamOperasional} • Tiket: {w.hargaTiket}</p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => startEditWisata(w)}
+                        className="text-teal-600 hover:text-teal-800 font-bold p-1 cursor-pointer flex items-center gap-1"
+                      >
+                        <Edit3 className="w-4 h-4" /> Edit
+                      </button>
+                      <button
+                        onClick={() => deleteWisata(w.id)}
+                        className="text-red-600 hover:text-red-800 font-bold p-1 cursor-pointer flex items-center gap-1"
+                      >
+                        <Trash2 className="w-4 h-4" /> Hapus
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>

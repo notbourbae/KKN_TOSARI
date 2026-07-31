@@ -24,6 +24,7 @@ import {
   updateUmkm as updateUmkmSupabase,
   deleteUmkm as deleteUmkmSupabase,
   createWisata,
+  updateWisata as updateWisataSupabase,
   deleteWisata as deleteWisataSupabase,
   createPotensiSDA,
   deletePotensiSDA as deletePotensiSDASupabase,
@@ -367,7 +368,12 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const updateWisata = (id: string, data: Partial<WisataItem>) => {
     setWisataList(prev => prev.map(w => w.id === id ? { ...w, ...data } : w));
-    // No Supabase update for wisata yet
+    if (isSupabaseConfigured && supabase) {
+      updateWisataSupabase(id, data).catch(err => {
+        console.error('Gagal update wisata ke Supabase:', err);
+        setAdminNotification({ type: 'error', message: 'Data wisata terupdate lokal, tapi gagal sync ke Supabase.' });
+      });
+    }
   };
 
   const deleteWisata = (id: string) => {

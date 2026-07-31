@@ -133,6 +133,27 @@ CREATE TABLE IF NOT EXISTS statistik_produksi (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- ─────────────────────────────────────────────
+-- MIGRASI TABEL LAMA
+-- Jalankan jika tabel sudah pernah dibuat sebelumnya
+-- (CREATE TABLE IF NOT EXISTS TIDAK menambah kolom baru)
+-- ─────────────────────────────────────────────
+ALTER TABLE wisata ADD COLUMN IF NOT EXISTS foto_lain JSONB DEFAULT '[]';
+ALTER TABLE wisata ADD COLUMN IF NOT EXISTS google_maps_pin TEXT DEFAULT '';
+ALTER TABLE wisata ADD COLUMN IF NOT EXISTS jam_operasional TEXT DEFAULT '';
+ALTER TABLE wisata ADD COLUMN IF NOT EXISTS harga_tiket TEXT DEFAULT '';
+ALTER TABLE wisata ADD COLUMN IF NOT EXISTS fasilitas JSONB DEFAULT '[]';
+ALTER TABLE wisata ADD COLUMN IF NOT EXISTS kontak_pengelola TEXT DEFAULT '';
+ALTER TABLE wisata ADD COLUMN IF NOT EXISTS rating REAL DEFAULT 5.0;
+ALTER TABLE wisata ADD COLUMN IF NOT EXISTS favorit BOOLEAN DEFAULT FALSE;
+ALTER TABLE wisata ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE wisata ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+
+ALTER TABLE wisata_events ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE wisata_events ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+
+ALTER TABLE budaya ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'aktif';
+
 -- Buat index untuk performa query
 CREATE INDEX IF NOT EXISTS idx_berita_created ON berita(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_umkm_created ON umkm(created_at DESC);
