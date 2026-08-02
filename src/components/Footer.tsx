@@ -117,13 +117,7 @@ export const Footer: React.FC = () => {
                 <Mail className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span>{dusunInfo.emailDusun}</span>
               </li>
-              <li className="pt-2">
-                <div className="bg-slate-800/80 p-3 rounded-xl border border-slate-700/60 text-[11px]">
-                  <p className="font-semibold text-white">Jam Pelayanan Administrasi:</p>
-                  <p className="text-slate-400">Senin - Jumat: 08:00 - 15:30 WIB</p>
-                  <p className="text-slate-400">Sabtu: 08:00 - 12:00 WIB (Piket)</p>
-                </div>
-              </li>
+
             </ul>
           </div>
 
