@@ -20,6 +20,7 @@ import {
   updatePejabat as updatePejabatSupabase,
   deletePejabat as deletePejabatSupabase,
   createBerita,
+  updateBerita as updateBeritaSupabase,
   deleteBerita as deleteBeritaSupabase,
   createUmkm,
   updateUmkm as updateUmkmSupabase,
@@ -28,6 +29,7 @@ import {
   updateWisata as updateWisataSupabase,
   deleteWisata as deleteWisataSupabase,
   createPotensiSDA,
+  updatePotensiSDA as updatePotensiSDASupabase,
   deletePotensiSDA as deletePotensiSDASupabase,
   createWisataEvent,
   updateWisataEvent as updateWisataEventSupabase,
@@ -348,7 +350,12 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const updateBerita = (id: string, data: Partial<BeritaItem>) => {
     invalidateDusunCache();
     setBeritaList(prev => prev.map(b => b.id === id ? { ...b, ...data } : b));
-    // No Supabase update for berita yet
+    if (isSupabaseConfigured && supabase) {
+      updateBeritaSupabase(id, data).catch(err => {
+        console.error('Gagal update berita ke Supabase:', err);
+        setAdminNotification({ type: 'error', message: 'Data berita terupdate lokal, tapi gagal sync ke Supabase.' });
+      });
+    }
   };
 
   const deleteBerita = (id: string) => {
@@ -552,7 +559,12 @@ export const DusunProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const updatePotensiSDA = (id: string, data: Partial<PotensiSDA>) => {
     invalidateDusunCache();
     setPotensiSDA(prev => prev.map(s => s.id === id ? { ...s, ...data } : s));
-    // No Supabase update for SDA yet
+    if (isSupabaseConfigured && supabase) {
+      updatePotensiSDASupabase(id, data).catch(err => {
+        console.error('Gagal update SDA ke Supabase:', err);
+        setAdminNotification({ type: 'error', message: 'Data SDA terupdate lokal, tapi gagal sync ke Supabase.' });
+      });
+    }
   };
 
   const deletePotensiSDA = (id: string) => {
